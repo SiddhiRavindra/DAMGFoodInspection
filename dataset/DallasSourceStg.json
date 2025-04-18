@@ -1,0 +1,112 @@
+{
+	"name": "DallasSourceStg",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "DataLakeStgFoodInspection",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "dallas_stg_final.csv",
+				"fileSystem": "bronze"
+			},
+			"columnDelimiter": "\t",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "RecordID",
+				"type": "String"
+			},
+			{
+				"name": "Restaurant Name",
+				"type": "String"
+			},
+			{
+				"name": "Inspection Year",
+				"type": "String"
+			},
+			{
+				"name": "Inspection Type",
+				"type": "String"
+			},
+			{
+				"name": "Inspection Score",
+				"type": "String"
+			},
+			{
+				"name": "Inspection Date",
+				"type": "String"
+			},
+			{
+				"name": "Street Number",
+				"type": "String"
+			},
+			{
+				"name": "Street Name",
+				"type": "String"
+			},
+			{
+				"name": "Street Direction",
+				"type": "String"
+			},
+			{
+				"name": "Street Address",
+				"type": "String"
+			},
+			{
+				"name": "Street Unit",
+				"type": "String"
+			},
+			{
+				"name": "Street Type",
+				"type": "String"
+			},
+			{
+				"name": "Zip Code",
+				"type": "String"
+			},
+			{
+				"name": "City",
+				"type": "String"
+			},
+			{
+				"name": "State",
+				"type": "String"
+			},
+			{
+				"name": "Latitude",
+				"type": "String"
+			},
+			{
+				"name": "Longitude",
+				"type": "String"
+			},
+			{
+				"name": "Violation Count",
+				"type": "String"
+			},
+			{
+				"name": "Total Violation Points",
+				"type": "String"
+			},
+			{
+				"name": "Location_Missing",
+				"type": "String"
+			},
+			{
+				"name": "Violation_Description",
+				"type": "String"
+			},
+			{
+				"name": "Violation_Number",
+				"type": "String"
+			}
+		]
+	}
+}

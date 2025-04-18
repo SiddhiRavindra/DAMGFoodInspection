@@ -1,0 +1,119 @@
+{
+	"name": "DallasSFSink",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_Food_Inspection_SF",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SnowflakeV2Table",
+		"schema": [
+			{
+				"name": "RECORDID",
+				"type": "NUMBER",
+				"precision": 38,
+				"scale": 0
+			},
+			{
+				"name": "RESTAURANT_NAME",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "INSPECTION_YEAR",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "INSPECTION_TYPE",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "INSPECTION_SCORE",
+				"type": "NUMBER",
+				"precision": 38,
+				"scale": 0
+			},
+			{
+				"name": "INSPECTION_DATE",
+				"type": "DATE"
+			},
+			{
+				"name": "STREET_NUMBER",
+				"type": "NUMBER",
+				"precision": 38,
+				"scale": 0
+			},
+			{
+				"name": "STREET_NAME",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "STREET_DIRECTION",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "STREET_ADDRESS",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "STREET_UNIT",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "STREET_TYPE",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "ZIP_CODE",
+				"type": "NUMBER",
+				"precision": 38,
+				"scale": 0
+			},
+			{
+				"name": "CITY",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "STATE",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "LATITUDE",
+				"type": "FLOAT"
+			},
+			{
+				"name": "LONGITUDE",
+				"type": "FLOAT"
+			},
+			{
+				"name": "VIOLATION_COUNT",
+				"type": "NUMBER",
+				"precision": 38,
+				"scale": 0
+			},
+			{
+				"name": "TOTAL_VIOLATION_POINTS",
+				"type": "NUMBER",
+				"precision": 38,
+				"scale": 0
+			},
+			{
+				"name": "LOCATION_MISSING",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "VIOLATION_DESCRIPTION",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "VIOLATION_NUMBER",
+				"type": "NUMBER",
+				"precision": 38,
+				"scale": 0
+			}
+		],
+		"typeProperties": {
+			"schema": "FOOD_SCHEMA",
+			"table": "STAGE_DALLAS_INSPECTIONS"
+		}
+	}
+}
