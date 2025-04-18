@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Stage",
+				"name": "StageDallas",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
@@ -46,6 +46,22 @@
 						"type": "DatasetReference"
 					}
 				]
+			},
+			{
+				"name": "StageChicago",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"enableStaging": false
+				}
 			}
 		],
 		"annotations": []
