@@ -1,0 +1,109 @@
+{
+	"name": "ParquetDallasSourceStg",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "DataLakeStgFoodInspection",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "dallascleanedparquetstg.parquet",
+				"fileSystem": "bronze"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "RecordID",
+				"type": "INT64"
+			},
+			{
+				"name": "Restaurant_Name",
+				"type": "UTF8"
+			},
+			{
+				"name": "Inspection_Year",
+				"type": "UTF8"
+			},
+			{
+				"name": "Inspection_Type",
+				"type": "UTF8"
+			},
+			{
+				"name": "Inspection_Score",
+				"type": "INT_16"
+			},
+			{
+				"name": "Inspection_Date",
+				"type": "DATE"
+			},
+			{
+				"name": "Street_Number",
+				"type": "INT64"
+			},
+			{
+				"name": "Street_Name",
+				"type": "UTF8"
+			},
+			{
+				"name": "Street_Direction",
+				"type": "UTF8"
+			},
+			{
+				"name": "Street_Address",
+				"type": "UTF8"
+			},
+			{
+				"name": "Street_Unit",
+				"type": "UTF8"
+			},
+			{
+				"name": "Street_Type",
+				"type": "UTF8"
+			},
+			{
+				"name": "Zip_Code",
+				"type": "INT32"
+			},
+			{
+				"name": "City",
+				"type": "UTF8"
+			},
+			{
+				"name": "State",
+				"type": "UTF8"
+			},
+			{
+				"name": "Latitude",
+				"type": "DOUBLE"
+			},
+			{
+				"name": "Longitude",
+				"type": "DOUBLE"
+			},
+			{
+				"name": "Violation_Count",
+				"type": "INT_16"
+			},
+			{
+				"name": "Total_Violation_Points",
+				"type": "INT_16"
+			},
+			{
+				"name": "Location_Missing",
+				"type": "UTF8"
+			},
+			{
+				"name": "Violation_Description",
+				"type": "UTF8"
+			},
+			{
+				"name": "Violation_Number",
+				"type": "INT32"
+			}
+		]
+	}
+}
