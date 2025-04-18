@@ -5,8 +5,8 @@
 		"annotations": [],
 		"type": "AzureBlobStorage",
 		"typeProperties": {
-			"sasUri": "https://blobstgfoodinspection.file.core.windows.net",
-			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkRBVEFGQUNUT1JZQDQ4OTlFNzg2LTE3MDAtNEZFMS1BRkI5LTZDQkE3RDU0MkM5Nl8yYmYxZGU2Zi02NTM4LTQ2ZTMtYmJiOC0yZWQxZDljOGQ0OTYiDQp9"
+			"sasUri": "https://blobstgfoodinspection.blob.core.windows.net/",
+			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkRBVEFGQUNUT1JZQDQ4OTlFNzg2LTE3MDAtNEZFMS1BRkI5LTZDQkE3RDU0MkM5Nl80MGY3MGQxZC00MTRjLTQ5OWEtYTAwOC1mMDdlMDc5MDBjMGUiDQp9"
 		}
 	}
 }
