@@ -19,7 +19,25 @@
 					"name": "source2"
 				},
 				{
+					"dataset": {
+						"referenceName": "SF_DIM_Inspection_Type",
+						"type": "DatasetReference"
+					},
 					"name": "source3"
+				},
+				{
+					"dataset": {
+						"referenceName": "SF_Dim_Location",
+						"type": "DatasetReference"
+					},
+					"name": "source4"
+				},
+				{
+					"dataset": {
+						"referenceName": "SF_Dim_Violation",
+						"type": "DatasetReference"
+					},
+					"name": "source5"
 				}
 			],
 			"sinks": [],
@@ -96,8 +114,38 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'table') ~> source2",
-				"source(allowSchemaDrift: true,",
-				"     validateSchema: false) ~> source3",
+				"source(output(",
+				"          INSPECTIONTYPE_SK as decimal(38,0),",
+				"          INSPECTION_TYPE as string,",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> source3",
+				"source(output(",
+				"          LOCATION_SK as decimal(38,0),",
+				"          ZIPCODE as string,",
+				"          LONGITUDE as double,",
+				"          LATITUDE as double,",
+				"          CITY as string,",
+				"          STATE as string,",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> source4",
+				"source(output(",
+				"          VIOLATION_SK as decimal(38,0),",
+				"          VIOLATION_NUMBER as decimal(38,0),",
+				"          VIOLATION_DESCRIPTION as string,",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> source5",
 				"source1 derive(DI_JOB_ID = \"ChicagoJob\") ~> DerivedChicago",
 				"source2 derive(DI_JOB_ID = \"DallasJob\") ~> DerivedDallas",
 				"DerivedChicago, DerivedDallas union(byName: true)~> union1",
