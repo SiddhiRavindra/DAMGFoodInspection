@@ -1,0 +1,113 @@
+{
+	"name": "ParquetChicagoStgSource",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "DataLakeStgFoodInspection",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "chicagocleanparquet.parquet",
+				"fileSystem": "bronze"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "Inspection_ID",
+				"type": "INT64"
+			},
+			{
+				"name": "Business_Name",
+				"type": "UTF8"
+			},
+			{
+				"name": "Also_Known_as",
+				"type": "UTF8"
+			},
+			{
+				"name": "License_Number",
+				"type": "INT64"
+			},
+			{
+				"name": "Facility_Type",
+				"type": "UTF8"
+			},
+			{
+				"name": "Risk",
+				"type": "UTF8"
+			},
+			{
+				"name": "Address",
+				"type": "UTF8"
+			},
+			{
+				"name": "City",
+				"type": "UTF8"
+			},
+			{
+				"name": "State",
+				"type": "UTF8"
+			},
+			{
+				"name": "Zip_Code",
+				"type": "INT32"
+			},
+			{
+				"name": "Inspection_Date",
+				"type": "DATE"
+			},
+			{
+				"name": "Inspection_Type",
+				"type": "UTF8"
+			},
+			{
+				"name": "Inspection_Results",
+				"type": "UTF8"
+			},
+			{
+				"name": "Violations",
+				"type": "UTF8"
+			},
+			{
+				"name": "Latitude",
+				"type": "DOUBLE"
+			},
+			{
+				"name": "Longitude",
+				"type": "DOUBLE"
+			},
+			{
+				"name": "Location",
+				"type": "UTF8"
+			},
+			{
+				"name": "Geo_Missing",
+				"type": "UTF8"
+			},
+			{
+				"name": "Violation_Count",
+				"type": "INT_16"
+			},
+			{
+				"name": "Outcome_Category",
+				"type": "UTF8"
+			},
+			{
+				"name": "Single_Violation_Entry",
+				"type": "UTF8"
+			},
+			{
+				"name": "Violation_Description",
+				"type": "UTF8"
+			},
+			{
+				"name": "Violation_Number",
+				"type": "INT_16"
+			}
+		]
+	}
+}
