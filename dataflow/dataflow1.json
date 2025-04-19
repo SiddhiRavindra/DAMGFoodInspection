@@ -1,0 +1,140 @@
+{
+	"name": "dataflow1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ChicagoSFSink",
+						"type": "DatasetReference"
+					},
+					"name": "sourceChicago"
+				},
+				{
+					"dataset": {
+						"referenceName": "DallasSFSink",
+						"type": "DatasetReference"
+					},
+					"name": "sourceDallas"
+				},
+				{
+					"dataset": {
+						"referenceName": "SFDIMRESTAURANT",
+						"type": "DatasetReference"
+					},
+					"name": "sourceDimrest"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "DerivedChicago"
+				},
+				{
+					"name": "DerivedDallas"
+				},
+				{
+					"name": "union1"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "lookuprest"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          INSPECTION_ID as decimal(38,0),",
+				"          RESTAURANT_NAME as string,",
+				"          ALSO_KNOWN_AS as string,",
+				"          LICENSE_NUMBER as decimal(38,0),",
+				"          FACILITY_TYPE as string,",
+				"          RISK as string,",
+				"          STREET_ADDRESS as string,",
+				"          CITY as string,",
+				"          STATE as string,",
+				"          ZIP_CODE as decimal(38,0),",
+				"          INSPECTION_DATE as date,",
+				"          INSPECTION_TYPE as string,",
+				"          INSPECTION_RESULTS as string,",
+				"          VIOLATIONS as string,",
+				"          LATITUDE as double,",
+				"          LONGITUDE as double,",
+				"          LOCATION as string,",
+				"          GEO_MISSING as string,",
+				"          VIOLATION_COUNT as decimal(38,0),",
+				"          OUTCOME_CATEGORY as string,",
+				"          SINGLE_VIOLATION_ENTRY as string,",
+				"          VIOLATION_DESCRIPTION as string,",
+				"          VIOLATION_NUMBER as decimal(38,0)",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> sourceChicago",
+				"source(output(",
+				"          RECORDID as decimal(38,0),",
+				"          RESTAURANT_NAME as string,",
+				"          INSPECTION_YEAR as string,",
+				"          INSPECTION_TYPE as string,",
+				"          INSPECTION_SCORE as decimal(38,0),",
+				"          INSPECTION_DATE as date,",
+				"          STREET_NUMBER as decimal(38,0),",
+				"          STREET_NAME as string,",
+				"          STREET_DIRECTION as string,",
+				"          STREET_ADDRESS as string,",
+				"          STREET_UNIT as string,",
+				"          STREET_TYPE as string,",
+				"          ZIP_CODE as decimal(38,0),",
+				"          CITY as string,",
+				"          STATE as string,",
+				"          LATITUDE as double,",
+				"          LONGITUDE as double,",
+				"          VIOLATION_COUNT as decimal(38,0),",
+				"          TOTAL_VIOLATION_POINTS as decimal(38,0),",
+				"          LOCATION_MISSING as string,",
+				"          VIOLATION_DESCRIPTION as string,",
+				"          VIOLATION_NUMBER as decimal(38,0)",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> sourceDallas",
+				"source(output(",
+				"          RESTAURANT_SK as decimal(38,0),",
+				"          RESTAURANT_NAME as string,",
+				"          STREET_ADDRESS as string,",
+				"          ZIPCODE as string,",
+				"          CITY as string,",
+				"          STATE as string,",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> sourceDimrest",
+				"sourceChicago derive(DI_JOB_ID = \"ChicagoJob\") ~> DerivedChicago",
+				"sourceDallas derive(DI_JOB_ID = \"DallasJob\") ~> DerivedDallas",
+				"DerivedChicago, DerivedDallas union(byName: true)~> union1",
+				"union1 select(mapColumn(",
+				"          RESTAURANT_NAME,",
+				"          CITY,",
+				"          STATE,",
+				"          ZIP_CODE,",
+				"          INSPECTION_DATE,",
+				"          INSPECTION_TYPE,",
+				"          VIOLATION_COUNT,",
+				"          VIOLATION_DESCRIPTION,",
+				"          VIOLATION_NUMBER,",
+				"          DI_JOB_ID",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1, sourceDimrest lookup(select1@CITY == sourceDimrest@CITY,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookuprest"
+			]
+		}
+	}
+}
