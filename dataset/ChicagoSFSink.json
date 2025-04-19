@@ -15,7 +15,7 @@
 				"scale": 0
 			},
 			{
-				"name": "BUSINESS_NAME",
+				"name": "RESTAURANT_NAME",
 				"type": "VARCHAR"
 			},
 			{
@@ -37,7 +37,7 @@
 				"type": "VARCHAR"
 			},
 			{
-				"name": "ADDRESS",
+				"name": "STREET_ADDRESS",
 				"type": "VARCHAR"
 			},
 			{
@@ -72,11 +72,15 @@
 			},
 			{
 				"name": "LATITUDE",
-				"type": "FLOAT"
+				"type": "FLOAT",
+				"precision": 38,
+				"scale": 0
 			},
 			{
 				"name": "LONGITUDE",
-				"type": "FLOAT"
+				"type": "FLOAT",
+				"precision": 38,
+				"scale": 0
 			},
 			{
 				"name": "LOCATION",

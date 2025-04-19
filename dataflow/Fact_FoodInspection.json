@@ -60,17 +60,20 @@
 				},
 				{
 					"name": "lookupRestaurant"
+				},
+				{
+					"name": "join1"
 				}
 			],
 			"scriptLines": [
 				"source(output(",
 				"          INSPECTION_ID as decimal(38,0),",
-				"          BUSINESS_NAME as string,",
+				"          RESTAURANT_NAME as string,",
 				"          ALSO_KNOWN_AS as string,",
 				"          LICENSE_NUMBER as decimal(38,0),",
 				"          FACILITY_TYPE as string,",
 				"          RISK as string,",
-				"          ADDRESS as string,",
+				"          STREET_ADDRESS as string,",
 				"          CITY as string,",
 				"          STATE as string,",
 				"          ZIP_CODE as decimal(38,0),",
@@ -166,10 +169,15 @@
 				"sourceStageChicago derive(DI_JOB_ID = \"ChicagoJob\") ~> DerivedChicago",
 				"sourceDallasStage derive(DI_JOB_ID = \"DallasJob\") ~> DerivedDallas",
 				"DerivedChicago, DerivedDallas union(byName: true)~> union1",
-				"union1, sourceDimRestaurant lookup(union1@RESTAURANT_NAME == sourceDimRestaurant@RESTAURANT_NAME,",
+				"join1, sourceDimRestaurant lookup(union1@CITY == sourceDimRestaurant@CITY,",
 				"     multiple: false,",
 				"     pickup: 'any',",
-				"     broadcast: 'auto')~> lookupRestaurant"
+				"     broadcast: 'auto')~> lookupRestaurant",
+				"union1, sourceDimRestaurant join(union1@RESTAURANT_NAME == sourceDimRestaurant@RESTAURANT_NAME,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1"
 			]
 		}
 	}
