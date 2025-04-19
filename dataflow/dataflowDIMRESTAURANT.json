@@ -30,9 +30,6 @@
 			],
 			"transformations": [
 				{
-					"name": "surrogateKey"
-				},
-				{
 					"name": "derivedColumn1"
 				},
 				{
@@ -43,6 +40,9 @@
 				},
 				{
 					"name": "union"
+				},
+				{
+					"name": "surrogateKey1"
 				}
 			],
 			"scriptLines": [
@@ -104,15 +104,14 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'table') ~> sourceDIMRESTAURANTCHICAGO",
-				"union keyGenerate(output(ROWNUM as long),",
-				"     startAt: 1L,",
-				"     stepValue: 1L) ~> surrogateKey",
-				"surrogateKey derive(DI_JOB_ID = uuid(),",
-				"          DI_LOAD_DT = currentTimestamp()) ~> derivedColumn1",
+				"union derive(DI_LOAD_DT = currentTimestamp()) ~> derivedColumn1",
 				"sourceDIMRESTAURANTDALLAS derive(DI_JOD_ID = 'Dallas') ~> derivedColumn2",
 				"sourceDIMRESTAURANTCHICAGO derive(DI_JOD_ID = 'Chicago') ~> derivedColumn3",
 				"derivedColumn2, derivedColumn3 union(byName: true)~> union",
-				"derivedColumn1 sink(allowSchemaDrift: true,",
+				"derivedColumn1 keyGenerate(output(rownum as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> surrogateKey1",
+				"surrogateKey1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          RESTAURANT_SK as decimal(38,0),",
@@ -132,7 +131,7 @@
 				"     format: 'table',",
 				"     stageInsert: true,",
 				"     mapColumn(",
-				"          RESTAURANT_SK = ROWNUM,",
+				"          RESTAURANT_SK = rownum,",
 				"          RESTAURANT_NAME,",
 				"          STREET_ADDRESS,",
 				"          ZIPCODE = ZIP_CODE,",
