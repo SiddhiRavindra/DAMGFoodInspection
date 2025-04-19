@@ -93,6 +93,241 @@
 							"type": "LinkedServiceReference"
 						},
 						"path": "gold"
+					},
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "Inspection_ID",
+									"type": "Int64"
+								},
+								"sink": {
+									"name": "INSPECTION_ID",
+									"type": "Int64"
+								}
+							},
+							{
+								"source": {
+									"name": "Business_Name",
+									"type": "String"
+								},
+								"sink": {
+									"name": "RESTAURANT_NAME",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Also_Known_as",
+									"type": "String"
+								},
+								"sink": {
+									"name": "ALSO_KNOWN_AS",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "License_Number",
+									"type": "Int64"
+								},
+								"sink": {
+									"name": "LICENSE_NUMBER",
+									"type": "Int64"
+								}
+							},
+							{
+								"source": {
+									"name": "Facility_Type",
+									"type": "String"
+								},
+								"sink": {
+									"name": "FACILITY_TYPE",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Risk",
+									"type": "String"
+								},
+								"sink": {
+									"name": "RISK",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Address",
+									"type": "String"
+								},
+								"sink": {
+									"name": "STREET_ADDRESS",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "City",
+									"type": "String"
+								},
+								"sink": {
+									"name": "CITY",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "State",
+									"type": "String"
+								},
+								"sink": {
+									"name": "STATE",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Zip_Code",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "ZIP_CODE",
+									"type": "Int64"
+								}
+							},
+							{
+								"source": {
+									"name": "Inspection_Date",
+									"type": "DateTime"
+								},
+								"sink": {
+									"name": "INSPECTION_DATE",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "Inspection_Type",
+									"type": "String"
+								},
+								"sink": {
+									"name": "INSPECTION_TYPE",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Inspection_Results",
+									"type": "String"
+								},
+								"sink": {
+									"name": "INSPECTION_RESULTS",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Violations",
+									"type": "String"
+								},
+								"sink": {
+									"name": "VIOLATIONS",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Latitude",
+									"type": "Double"
+								},
+								"sink": {
+									"name": "LATITUDE",
+									"type": "Double"
+								}
+							},
+							{
+								"source": {
+									"name": "Longitude",
+									"type": "Double"
+								},
+								"sink": {
+									"name": "LONGITUDE",
+									"type": "Double"
+								}
+							},
+							{
+								"source": {
+									"name": "Location",
+									"type": "String"
+								},
+								"sink": {
+									"name": "LOCATION",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Geo_Missing",
+									"type": "String"
+								},
+								"sink": {
+									"name": "GEO_MISSING",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Violation_Count",
+									"type": "Int16"
+								},
+								"sink": {
+									"name": "VIOLATION_COUNT",
+									"type": "Int64"
+								}
+							},
+							{
+								"source": {
+									"name": "Outcome_Category",
+									"type": "String"
+								},
+								"sink": {
+									"name": "OUTCOME_CATEGORY",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Single_Violation_Entry",
+									"type": "String"
+								},
+								"sink": {
+									"name": "SINGLE_VIOLATION_ENTRY",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Violation_Description",
+									"type": "String"
+								},
+								"sink": {
+									"name": "VIOLATION_DESCRIPTION",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Violation_Number",
+									"type": "Int16"
+								},
+								"sink": {
+									"name": "VIOLATION_NUMBER",
+									"type": "Int64"
+								}
+							}
+						]
 					}
 				},
 				"inputs": [
@@ -111,6 +346,8 @@
 			{
 				"name": "DfStgDallas",
 				"type": "ExecuteDataFlow",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
