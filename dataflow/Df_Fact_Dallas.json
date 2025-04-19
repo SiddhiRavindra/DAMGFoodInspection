@@ -31,6 +31,20 @@
 						"type": "DatasetReference"
 					},
 					"name": "sourcedimlocation"
+				},
+				{
+					"dataset": {
+						"referenceName": "SF_DIM_Inspection_Type",
+						"type": "DatasetReference"
+					},
+					"name": "sourcediminspection"
+				},
+				{
+					"dataset": {
+						"referenceName": "SF_Dim_Violation",
+						"type": "DatasetReference"
+					},
+					"name": "sourcedimviolation"
 				}
 			],
 			"sinks": [],
@@ -49,6 +63,12 @@
 				},
 				{
 					"name": "joinlocation"
+				},
+				{
+					"name": "joininspectiontype"
+				},
+				{
+					"name": "joinviolation"
 				}
 			],
 			"scriptLines": [
@@ -116,6 +136,25 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'table') ~> sourcedimlocation",
+				"source(output(",
+				"          INSPECTIONTYPE_SK as decimal(38,0),",
+				"          INSPECTION_TYPE as string,",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> sourcediminspection",
+				"source(output(",
+				"          VIOLATION_SK as decimal(38,0),",
+				"          VIOLATION_NUMBER as decimal(38,0),",
+				"          VIOLATION_DESCRIPTION as string,",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> sourcedimviolation",
 				"sourcedallas derive(DI_JOB_ID = \"DallasJob\") ~> DerivedDallas",
 				"DerivedDallas keyGenerate(output(rownum as long),",
 				"     startAt: 1L,",
@@ -130,11 +169,21 @@
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joindate",
-				"joindate, sourcedimlocation join(ERROR_FUNCTION('') == ERROR_FUNCTION(''),",
+				"joindate, sourcedimlocation join(sourcedallas@CITY == sourcedimlocation@CITY,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> joinlocation"
+				"     broadcast: 'auto')~> joinlocation",
+				"joinlocation, sourcediminspection join(sourcedallas@INSPECTION_TYPE == sourcediminspection@INSPECTION_TYPE,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joininspectiontype",
+				"joininspectiontype, sourcedimviolation join(ERROR_FUNCTION('') == ERROR_FUNCTION(''),",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinviolation"
 			]
 		}
 	}
