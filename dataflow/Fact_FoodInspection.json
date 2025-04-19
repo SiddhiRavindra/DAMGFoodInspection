@@ -1,0 +1,92 @@
+{
+	"name": "Fact_FoodInspection",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ChicagoSFSink",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				},
+				{
+					"dataset": {
+						"referenceName": "DallasSFSink",
+						"type": "DatasetReference"
+					},
+					"name": "source2"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "DerivedChicago"
+				},
+				{
+					"name": "DerivedDallas"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          INSPECTION_ID as decimal(38,0),",
+				"          BUSINESS_NAME as string,",
+				"          ALSO_KNOWN_AS as string,",
+				"          LICENSE_NUMBER as decimal(38,0),",
+				"          FACILITY_TYPE as string,",
+				"          RISK as string,",
+				"          ADDRESS as string,",
+				"          CITY as string,",
+				"          STATE as string,",
+				"          ZIP_CODE as decimal(38,0),",
+				"          INSPECTION_DATE as date,",
+				"          INSPECTION_TYPE as string,",
+				"          INSPECTION_RESULTS as string,",
+				"          VIOLATIONS as string,",
+				"          LATITUDE as double,",
+				"          LONGITUDE as double,",
+				"          LOCATION as string,",
+				"          GEO_MISSING as string,",
+				"          VIOLATION_COUNT as decimal(38,0),",
+				"          OUTCOME_CATEGORY as string,",
+				"          SINGLE_VIOLATION_ENTRY as string,",
+				"          VIOLATION_DESCRIPTION as string,",
+				"          VIOLATION_NUMBER as decimal(38,0)",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> source1",
+				"source(output(",
+				"          RECORDID as decimal(38,0),",
+				"          RESTAURANT_NAME as string,",
+				"          INSPECTION_YEAR as string,",
+				"          INSPECTION_TYPE as string,",
+				"          INSPECTION_SCORE as decimal(38,0),",
+				"          INSPECTION_DATE as date,",
+				"          STREET_NUMBER as decimal(38,0),",
+				"          STREET_NAME as string,",
+				"          STREET_DIRECTION as string,",
+				"          STREET_ADDRESS as string,",
+				"          STREET_UNIT as string,",
+				"          STREET_TYPE as string,",
+				"          ZIP_CODE as decimal(38,0),",
+				"          CITY as string,",
+				"          STATE as string,",
+				"          LATITUDE as double,",
+				"          LONGITUDE as double,",
+				"          VIOLATION_COUNT as decimal(38,0),",
+				"          TOTAL_VIOLATION_POINTS as decimal(38,0),",
+				"          LOCATION_MISSING as string,",
+				"          VIOLATION_DESCRIPTION as string,",
+				"          VIOLATION_NUMBER as decimal(38,0)",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> source2",
+				"source1 derive(DI_JOB_ID = \"ChicagoJob\") ~> DerivedChicago",
+				"source2 derive(DI_JOB_ID = \"DallasJob\") ~> DerivedDallas"
+			]
+		}
+	}
+}
