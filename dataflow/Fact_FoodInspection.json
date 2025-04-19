@@ -82,7 +82,7 @@
 					"name": "surrogateKeyLoaction"
 				},
 				{
-					"name": "join1"
+					"name": "joinDate"
 				}
 			],
 			"scriptLines": [
@@ -176,7 +176,7 @@
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinRestuarant",
-				"join1, sourceDimInspectionType join(sourceStageChicago@INSPECTION_TYPE == sourceDimInspectionType@INSPECTION_TYPE,",
+				"joinDate, sourceDimInspectionType join(sourceStageChicago@INSPECTION_TYPE == sourceDimInspectionType@INSPECTION_TYPE,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
@@ -220,7 +220,7 @@
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> join1",
+				"     broadcast: 'auto')~> joinDate",
 				"select1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
