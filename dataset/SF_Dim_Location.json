@@ -16,7 +16,9 @@
 			},
 			{
 				"name": "ZIPCODE",
-				"type": "VARCHAR"
+				"type": "NUMBER",
+				"precision": 38,
+				"scale": 0
 			},
 			{
 				"name": "LONGITUDE",
