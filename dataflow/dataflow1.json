@@ -26,7 +26,18 @@
 					"name": "sourceDimrest"
 				},
 				{
-					"name": "source1"
+					"dataset": {
+						"referenceName": "SfDimDate",
+						"type": "DatasetReference"
+					},
+					"name": "sourcedate"
+				},
+				{
+					"dataset": {
+						"referenceName": "SF_Dim_Location",
+						"type": "DatasetReference"
+					},
+					"name": "sourcelocation"
 				}
 			],
 			"sinks": [],
@@ -48,6 +59,9 @@
 				},
 				{
 					"name": "lookupdate"
+				},
+				{
+					"name": "lookuplocation"
 				}
 			],
 			"scriptLines": [
@@ -119,8 +133,30 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'table') ~> sourceDimrest",
-				"source(allowSchemaDrift: true,",
-				"     validateSchema: false) ~> source1",
+				"source(output(",
+				"          DATE_SK as decimal(38,0),",
+				"          INSPECTION_DATE as date,",
+				"          INSPECTION_MONTH as string,",
+				"          INSPECTION_YEAR as decimal(38,0),",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> sourcedate",
+				"source(output(",
+				"          LOCATION_SK as decimal(38,0),",
+				"          ZIPCODE as string,",
+				"          LONGITUDE as double,",
+				"          LATITUDE as double,",
+				"          CITY as string,",
+				"          STATE as string,",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> sourcelocation",
 				"sourceChicago derive(DI_JOB_ID = \"ChicagoJob\") ~> DerivedChicago",
 				"sourceDallas derive(DI_JOB_ID = \"DallasJob\") ~> DerivedDallas",
 				"DerivedChicago, DerivedDallas union(byName: true)~> union1",
@@ -142,10 +178,14 @@
 				"     multiple: false,",
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> lookuprest",
-				"lookuprest lookup(ERROR_FUNCTION('') == ERROR_FUNCTION(''),",
+				"lookuprest, sourcedate lookup(select1@INSPECTION_DATE == sourcedate@INSPECTION_DATE,",
 				"     multiple: false,",
 				"     pickup: 'any',",
-				"     broadcast: 'auto')~> lookupdate"
+				"     broadcast: 'auto')~> lookupdate",
+				"lookupdate, sourcelocation lookup(sourceDimrest@ZIPCODE == sourcelocation@ZIPCODE,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookuplocation"
 			]
 		}
 	}
