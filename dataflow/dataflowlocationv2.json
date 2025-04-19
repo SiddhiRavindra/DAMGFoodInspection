@@ -181,7 +181,7 @@
 				"          LATITUDE = aggregate1@LATITUDE,",
 				"          CITY = aggregate1@CITY,",
 				"          STATE = aggregate1@STATE,",
-				"          ZIPCODE,",
+				"          ZIPCODE = ZIP_CODE,",
 				"          MAXLOCATIONSK,",
 				"          DI_JOB_ID = aggregate1@DI_JOB_ID,",
 				"          DI_LOAD_DATE",
