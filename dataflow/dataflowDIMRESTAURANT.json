@@ -26,13 +26,6 @@
 						"type": "DatasetReference"
 					},
 					"name": "sinkDALLAS"
-				},
-				{
-					"dataset": {
-						"referenceName": "SFDIMRESTAURANT",
-						"type": "DatasetReference"
-					},
-					"name": "sinkChicago"
 				}
 			],
 			"transformations": [
@@ -43,10 +36,13 @@
 					"name": "derivedColumn1"
 				},
 				{
-					"name": "surrogateKeyChicago"
+					"name": "derivedColumn2"
 				},
 				{
-					"name": "derivedColumn2"
+					"name": "derivedColumn3"
+				},
+				{
+					"name": "union"
 				}
 			],
 			"scriptLines": [
@@ -108,16 +104,14 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'table') ~> sourceDIMRESTAURANTCHICAGO",
-				"sourceDIMRESTAURANTDALLAS keyGenerate(output(ROWNUM as long),",
+				"union keyGenerate(output(ROWNUM as long),",
 				"     startAt: 1L,",
 				"     stepValue: 1L) ~> surrogateKey",
 				"surrogateKey derive(DI_JOB_ID = uuid(),",
 				"          DI_LOAD_DT = currentTimestamp()) ~> derivedColumn1",
-				"sourceDIMRESTAURANTCHICAGO keyGenerate(output(ROWNUM as long),",
-				"     startAt: 1L,",
-				"     stepValue: 1L) ~> surrogateKeyChicago",
-				"surrogateKeyChicago derive(DI_JOB_ID = $jobid,",
-				"          DI_LOAD_DT = currentTimestamp()) ~> derivedColumn2",
+				"sourceDIMRESTAURANTDALLAS derive(DI_JOD_ID = 'Dallas') ~> derivedColumn2",
+				"sourceDIMRESTAURANTCHICAGO derive(DI_JOD_ID = 'Chicago') ~> derivedColumn3",
+				"derivedColumn2, derivedColumn3 union(byName: true)~> union",
 				"derivedColumn1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
@@ -146,38 +140,7 @@
 				"          STATE,",
 				"          DI_JOB_ID,",
 				"          DI_LOAD_DATE = DI_LOAD_DT",
-				"     )) ~> sinkDALLAS",
-				"derivedColumn2 sink(allowSchemaDrift: true,",
-				"     validateSchema: false,",
-				"     input(",
-				"          RESTAURANT_SK as decimal(38,0),",
-				"          RESTAURANT_NAME as string,",
-				"          STREET_ADDRESS as string,",
-				"          ZIPCODE as string,",
-				"          CITY as string,",
-				"          STATE as string,",
-				"          DI_JOB_ID as string,",
-				"          DI_LOAD_DATE as date",
-				"     ),",
-				"     deletable:false,",
-				"     insertable:true,",
-				"     updateable:false,",
-				"     upsertable:false,",
-				"     truncate:true,",
-				"     format: 'table',",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true,",
-				"     stageInsert: true,",
-				"     mapColumn(",
-				"          RESTAURANT_SK = ROWNUM,",
-				"          RESTAURANT_NAME = BUSINESS_NAME,",
-				"          STREET_ADDRESS = ADDRESS,",
-				"          ZIPCODE = ZIP_CODE,",
-				"          CITY,",
-				"          STATE,",
-				"          DI_JOB_ID,",
-				"          DI_LOAD_DATE = DI_LOAD_DT",
-				"     )) ~> sinkChicago"
+				"     )) ~> sinkDALLAS"
 			]
 		}
 	}
