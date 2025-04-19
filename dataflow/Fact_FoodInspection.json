@@ -45,6 +45,13 @@
 						"type": "DatasetReference"
 					},
 					"name": "sourceDimRestaurant"
+				},
+				{
+					"dataset": {
+						"referenceName": "SfDimDate",
+						"type": "DatasetReference"
+					},
+					"name": "sourceDimDate"
 				}
 			],
 			"sinks": [],
@@ -62,7 +69,22 @@
 					"name": "lookupRestaurant"
 				},
 				{
-					"name": "join1"
+					"name": "joinRestuarant"
+				},
+				{
+					"name": "joinDate"
+				},
+				{
+					"name": "joinLocation"
+				},
+				{
+					"name": "joinInspectionType"
+				},
+				{
+					"name": "joinViolation"
+				},
+				{
+					"name": "violationCount"
 				}
 			],
 			"scriptLines": [
@@ -166,10 +188,21 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'table') ~> sourceDimRestaurant",
+				"source(output(",
+				"          DATE_SK as decimal(38,0),",
+				"          INSPECTION_DATE as date,",
+				"          INSPECTION_MONTH as string,",
+				"          INSPECTION_YEAR as decimal(38,0),",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> sourceDimDate",
 				"sourceStageChicago derive(DI_JOB_ID = \"ChicagoJob\") ~> DerivedChicago",
 				"sourceDallasStage derive(DI_JOB_ID = \"DallasJob\") ~> DerivedDallas",
 				"DerivedChicago, DerivedDallas union(byName: true)~> union1",
-				"join1, sourceDimRestaurant lookup(union1@CITY == sourceDimRestaurant@CITY,",
+				"violationCount, sourceDimRestaurant lookup(union1@CITY == sourceDimRestaurant@CITY,",
 				"     multiple: false,",
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> lookupRestaurant",
@@ -177,7 +210,32 @@
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> join1"
+				"     broadcast: 'auto')~> joinRestuarant",
+				"joinRestuarant, sourceDimDate join(union1@INSPECTION_DATE == sourceDimDate@INSPECTION_DATE,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinDate",
+				"joinDate, sourceDimLocation join(union1@CITY == sourceDimLocation@CITY,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinLocation",
+				"joinLocation, sourceDimInspectionType join(union1@INSPECTION_TYPE == sourceDimInspectionType@INSPECTION_TYPE,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinInspectionType",
+				"joinInspectionType, sourceDimViolation join(union1@VIOLATION_NUMBER == sourceDimViolation@VIOLATION_NUMBER,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinViolation",
+				"joinViolation, sourceDimViolation join(union1@VIOLATION_NUMBER == sourceDimViolation@VIOLATION_NUMBER,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> violationCount"
 			]
 		}
 	}
