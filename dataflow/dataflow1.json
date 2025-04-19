@@ -164,7 +164,7 @@
 				"          RESTAURANT_NAME,",
 				"          CITY,",
 				"          STATE,",
-				"          ZIP_CODE,",
+				"          ZIPCODE = ZIP_CODE,",
 				"          INSPECTION_DATE,",
 				"          INSPECTION_TYPE,",
 				"          VIOLATION_COUNT,",
@@ -182,7 +182,7 @@
 				"     multiple: false,",
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> lookupdate",
-				"lookupdate, sourcelocation lookup(sourceDimrest@ZIPCODE == sourcelocation@ZIPCODE,",
+				"lookupdate, sourcelocation lookup(select1@ZIPCODE == sourcelocation@ZIPCODE,",
 				"     multiple: false,",
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> lookuplocation"
