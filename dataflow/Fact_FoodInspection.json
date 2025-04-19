@@ -79,13 +79,7 @@
 					"name": "select1"
 				},
 				{
-					"name": "surrogateKeyLoaction"
-				},
-				{
 					"name": "joinDate"
-				},
-				{
-					"name": "surrogateKey2"
 				},
 				{
 					"name": "joinloc"
@@ -177,7 +171,7 @@
 				"     validateSchema: false,",
 				"     format: 'table') ~> sourceDimDate",
 				"sourceStageChicago derive(DI_JOB_ID = \"ChicagoJob\") ~> DerivedChicago",
-				"surrogateKey2, sourceDimRestaurant join(sourceStageChicago@RESTAURANT_NAME == sourceDimRestaurant@RESTAURANT_NAME,",
+				"surrogateKey1, sourceDimRestaurant join(sourceStageChicago@RESTAURANT_NAME == sourceDimRestaurant@RESTAURANT_NAME,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
@@ -219,17 +213,11 @@
 				"     ),",
 				"     skipDuplicateMapInputs: false,",
 				"     skipDuplicateMapOutputs: false) ~> select1",
-				"surrogateKey1 keyGenerate(output(locationsk as long),",
-				"     startAt: 1L,",
-				"     stepValue: 1L) ~> surrogateKeyLoaction",
 				"joinloc, sourceDimDate join(sourceStageChicago@INSPECTION_DATE == sourceDimDate@INSPECTION_DATE,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinDate",
-				"surrogateKeyLoaction keyGenerate(output(violationsk as long),",
-				"     startAt: 1L,",
-				"     stepValue: 1L) ~> surrogateKey2",
 				"joinRestuarant, sourceDimLocation join(sourceDimRestaurant@ZIPCODE == sourceDimLocation@ZIPCODE",
 				"     && sourceStageChicago@CITY == sourceDimLocation@CITY",
 				"     && sourceStageChicago@STATE == sourceDimLocation@STATE,",
