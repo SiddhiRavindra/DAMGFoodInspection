@@ -17,6 +17,9 @@
 						"type": "DatasetReference"
 					},
 					"name": "source2"
+				},
+				{
+					"name": "source3"
 				}
 			],
 			"sinks": [
@@ -53,6 +56,9 @@
 				},
 				{
 					"name": "select2"
+				},
+				{
+					"name": "union1"
 				}
 			],
 			"scriptLines": [
@@ -111,6 +117,8 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'table') ~> source2",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false) ~> source3",
 				"sourceDallasStage keyGenerate(output(INSPECTIONTYPE_SK as long),",
 				"     startAt: 1L,",
 				"     stepValue: 1L) ~> surrogateKey1",
@@ -137,6 +145,7 @@
 				"     ),",
 				"     skipDuplicateMapInputs: false,",
 				"     skipDuplicateMapOutputs: false) ~> select2",
+				"source3 union(byName: true)~> union1",
 				"select1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
