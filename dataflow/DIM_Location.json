@@ -127,7 +127,7 @@
 				"     validateSchema: false,",
 				"     input(",
 				"          LOCATION_SK as decimal(38,0),",
-				"          ZIPCODE as string,",
+				"          ZIPCODE as decimal(38,0),",
 				"          LONGITUDE as double,",
 				"          LATITUDE as double,",
 				"          CITY as string,",
