@@ -99,6 +99,9 @@
 				},
 				{
 					"name": "surrogateKey1"
+				},
+				{
+					"name": "derivedColumn2"
 				}
 			],
 			"scriptLines": [
@@ -269,7 +272,9 @@
 				"select2 keyGenerate(output(INSPECTION_SK as long),",
 				"     startAt: 1L,",
 				"     stepValue: 1L) ~> surrogateKey1",
-				"surrogateKey1 sink(allowSchemaDrift: true,",
+				"surrogateKey1 derive(INSPECTION_SK = INSPECTION_SK <= 50000",
+				") ~> derivedColumn2",
+				"derivedColumn2 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          INSPECTION_SK as decimal(38,0),",
@@ -300,12 +305,12 @@
 				"          LOCATION_SK,",
 				"          INSPECTIONTYPE_SK,",
 				"          VIOLATION_SK,",
+				"          INSPECTION_TYPE,",
 				"          VIOLATION_COUNT,",
 				"          CITY,",
 				"          STATE,",
 				"          DI_JOB_ID,",
-				"          DI_LOAD_DATE,",
-				"          INSPECTION_TYPE",
+				"          DI_LOAD_DATE",
 				"     )) ~> sink1"
 			]
 		}
