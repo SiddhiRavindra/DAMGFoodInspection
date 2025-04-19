@@ -138,7 +138,7 @@
 				"     format: 'table',",
 				"     stageInsert: true,",
 				"     mapColumn(",
-				"          RESTAURANT_SK = RECORDID,",
+				"          RESTAURANT_SK = ROWNUM,",
 				"          RESTAURANT_NAME,",
 				"          STREET_ADDRESS,",
 				"          ZIPCODE = ZIP_CODE,",
