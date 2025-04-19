@@ -59,10 +59,7 @@
 					"name": "union1"
 				},
 				{
-					"name": "derivedColumn1"
-				},
-				{
-					"name": "select1"
+					"name": "lookupRestaurant"
 				}
 			],
 			"scriptLines": [
@@ -169,48 +166,10 @@
 				"sourceStageChicago derive(DI_JOB_ID = \"ChicagoJob\") ~> DerivedChicago",
 				"sourceDallasStage derive(DI_JOB_ID = \"DallasJob\") ~> DerivedDallas",
 				"DerivedChicago, DerivedDallas union(byName: true)~> union1",
-				"union1 derive(DI_LOAD_DATE = currentDate()) ~> derivedColumn1",
-				"derivedColumn1 select(mapColumn(",
-				"          INSPECTION_ID,",
-				"          BUSINESS_NAME,",
-				"          ALSO_KNOWN_AS,",
-				"          LICENSE_NUMBER,",
-				"          FACILITY_TYPE,",
-				"          RISK,",
-				"          ADDRESS,",
-				"          CITY,",
-				"          STATE,",
-				"          ZIP_CODE,",
-				"          INSPECTION_DATE,",
-				"          INSPECTION_TYPE,",
-				"          INSPECTION_RESULTS,",
-				"          VIOLATIONS,",
-				"          LATITUDE,",
-				"          LONGITUDE,",
-				"          LOCATION,",
-				"          GEO_MISSING,",
-				"          VIOLATION_COUNT,",
-				"          OUTCOME_CATEGORY,",
-				"          SINGLE_VIOLATION_ENTRY,",
-				"          VIOLATION_DESCRIPTION,",
-				"          VIOLATION_NUMBER,",
-				"          DI_JOB_ID,",
-				"          RECORDID,",
-				"          RESTAURANT_NAME,",
-				"          INSPECTION_YEAR,",
-				"          INSPECTION_SCORE,",
-				"          STREET_NUMBER,",
-				"          STREET_NAME,",
-				"          STREET_DIRECTION,",
-				"          STREET_ADDRESS,",
-				"          STREET_UNIT,",
-				"          STREET_TYPE,",
-				"          TOTAL_VIOLATION_POINTS,",
-				"          LOCATION_MISSING,",
-				"          DI_LOAD_DATE",
-				"     ),",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select1"
+				"union1, sourceDimRestaurant lookup(union1@RESTAURANT_NAME == sourceDimRestaurant@RESTAURANT_NAME,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookupRestaurant"
 			]
 		}
 	}
