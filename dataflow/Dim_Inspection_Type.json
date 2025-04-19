@@ -56,9 +56,6 @@
 				}
 			],
 			"scriptLines": [
-				"parameters{",
-				"     JobID as string (\"10\")",
-				"}",
 				"source(output(",
 				"          RECORDID as decimal(38,0),",
 				"          RESTAURANT_NAME as string,",
