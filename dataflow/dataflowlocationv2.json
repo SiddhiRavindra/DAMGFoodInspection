@@ -5,9 +5,17 @@
 		"typeProperties": {
 			"sources": [
 				{
+					"dataset": {
+						"referenceName": "ChicagoSFSink",
+						"type": "DatasetReference"
+					},
 					"name": "sourcechicago"
 				},
 				{
+					"dataset": {
+						"referenceName": "DallasSFSink",
+						"type": "DatasetReference"
+					},
 					"name": "sourcedallas"
 				},
 				{
@@ -16,9 +24,24 @@
 						"type": "DatasetReference"
 					},
 					"name": "sourcemax"
+				},
+				{
+					"dataset": {
+						"referenceName": "SF_Dim_Location",
+						"type": "DatasetReference"
+					},
+					"name": "sourcedimlocation"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "SF_Dim_Location",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
 			"transformations": [
 				{
 					"name": "derivedchicago"
@@ -28,23 +51,180 @@
 				},
 				{
 					"name": "union1"
+				},
+				{
+					"name": "join1"
+				},
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "join2"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "surrogateKey1"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "select2"
 				}
 			],
 			"scriptLines": [
-				"source(allowSchemaDrift: true,",
-				"     validateSchema: false) ~> sourcechicago",
-				"source(allowSchemaDrift: true,",
-				"     validateSchema: false) ~> sourcedallas",
 				"source(output(",
-				"          MAXVIOLATIONSK as decimal(38,0)",
+				"          INSPECTION_ID as decimal(38,0),",
+				"          RESTAURANT_NAME as string,",
+				"          ALSO_KNOWN_AS as string,",
+				"          LICENSE_NUMBER as decimal(38,0),",
+				"          FACILITY_TYPE as string,",
+				"          RISK as string,",
+				"          STREET_ADDRESS as string,",
+				"          CITY as string,",
+				"          STATE as string,",
+				"          ZIP_CODE as decimal(38,0),",
+				"          INSPECTION_DATE as date,",
+				"          INSPECTION_TYPE as string,",
+				"          INSPECTION_RESULTS as string,",
+				"          VIOLATIONS as string,",
+				"          LATITUDE as double,",
+				"          LONGITUDE as double,",
+				"          LOCATION as string,",
+				"          GEO_MISSING as string,",
+				"          VIOLATION_COUNT as decimal(38,0),",
+				"          OUTCOME_CATEGORY as string,",
+				"          SINGLE_VIOLATION_ENTRY as string,",
+				"          VIOLATION_DESCRIPTION as string,",
+				"          VIOLATION_NUMBER as decimal(38,0)",
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     query: 'select NVL(MAX(LOCATION_SK),0) as MaxViolationSK FROM FOOD_SCHEMA.DIM_LOCATION_TEST',",
+				"     format: 'table') ~> sourcechicago",
+				"source(output(",
+				"          RECORDID as decimal(38,0),",
+				"          RESTAURANT_NAME as string,",
+				"          INSPECTION_YEAR as string,",
+				"          INSPECTION_TYPE as string,",
+				"          INSPECTION_SCORE as decimal(38,0),",
+				"          INSPECTION_DATE as date,",
+				"          STREET_NUMBER as decimal(38,0),",
+				"          STREET_NAME as string,",
+				"          STREET_DIRECTION as string,",
+				"          STREET_ADDRESS as string,",
+				"          STREET_UNIT as string,",
+				"          STREET_TYPE as string,",
+				"          ZIP_CODE as decimal(38,0),",
+				"          CITY as string,",
+				"          STATE as string,",
+				"          LATITUDE as double,",
+				"          LONGITUDE as double,",
+				"          VIOLATION_COUNT as decimal(38,0),",
+				"          TOTAL_VIOLATION_POINTS as decimal(38,0),",
+				"          LOCATION_MISSING as string,",
+				"          VIOLATION_DESCRIPTION as string,",
+				"          VIOLATION_NUMBER as decimal(38,0)",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> sourcedallas",
+				"source(output(",
+				"          MAXLOCATIONSK as decimal(38,0)",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     query: 'select NVL(MAX(LOCATION_SK),0) as MaxLocationSK FROM FOOD_SCHEMA.DIM_LOCATION_TEST',",
 				"     format: 'query') ~> sourcemax",
+				"source(output(",
+				"          LOCATION_SK as decimal(38,0),",
+				"          ZIPCODE as decimal(38,0),",
+				"          LONGITUDE as double,",
+				"          LATITUDE as double,",
+				"          CITY as string,",
+				"          STATE as string,",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> sourcedimlocation",
 				"sourcechicago derive(DI_JOB_ID = \"ChicagoJob\") ~> derivedchicago",
 				"sourcedallas derive(DI_JOB_ID = \"DallasJob\") ~> derivedDallas",
-				"derivedchicago union(byName: true)~> union1"
+				"derivedchicago union(byName: true)~> union1",
+				"union1, sourcemax join(1==1,",
+				"     joinType:'cross',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"join1 aggregate(groupBy(ZIP_CODE,",
+				"          LONGITUDE,",
+				"          LATITUDE,",
+				"          CITY,",
+				"          STATE,",
+				"          MAXLOCATIONSK,",
+				"          DI_JOB_ID),",
+				"     CountRow = count(INSPECTION_ID)) ~> aggregate1",
+				"aggregate1, sourcedimlocation join(ZIP_CODE == ZIPCODE",
+				"     && aggregate1@LONGITUDE == sourcedimlocation@LONGITUDE",
+				"     && aggregate1@LATITUDE == sourcedimlocation@LATITUDE",
+				"     && aggregate1@CITY == sourcedimlocation@CITY",
+				"     && aggregate1@STATE == sourcedimlocation@STATE,",
+				"     joinType:'left',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join2",
+				"join2 select(mapColumn(",
+				"          LOCATION_SK,",
+				"          LONGITUDE = aggregate1@LONGITUDE,",
+				"          LATITUDE = aggregate1@LATITUDE,",
+				"          CITY = aggregate1@CITY,",
+				"          STATE = aggregate1@STATE,",
+				"          ZIPCODE,",
+				"          MAXLOCATIONSK,",
+				"          DI_JOB_ID = aggregate1@DI_JOB_ID,",
+				"          DI_LOAD_DATE",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 keyGenerate(output(rownum as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> surrogateKey1",
+				"surrogateKey1 derive(DI_LOAD_DATE = currentDate(),",
+				"          LOCATION_SK = MAXLOCATIONSK+rownum) ~> derivedColumn1",
+				"derivedColumn1 select(mapColumn(",
+				"          LOCATION_SK,",
+				"          LONGITUDE,",
+				"          LATITUDE,",
+				"          CITY,",
+				"          STATE,",
+				"          ZIPCODE,",
+				"          DI_JOB_ID,",
+				"          DI_LOAD_DATE",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"select2 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          LOCATION_SK as decimal(38,0),",
+				"          ZIPCODE as decimal(38,0),",
+				"          LONGITUDE as double,",
+				"          LATITUDE as double,",
+				"          CITY as string,",
+				"          STATE as string,",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     stageInsert: true) ~> sink1"
 			]
 		}
 	}
