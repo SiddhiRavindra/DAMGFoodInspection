@@ -1,0 +1,179 @@
+{
+	"name": "SnowflakeTableUnifiedStg",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_Food_Inspection_SF",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SnowflakeV2Table",
+		"schema": [
+			{
+				"name": "RECORDID",
+				"type": "NUMBER",
+				"precision": 38,
+				"scale": 0
+			},
+			{
+				"name": "INSPECTION_ID",
+				"type": "NUMBER",
+				"precision": 38,
+				"scale": 0
+			},
+			{
+				"name": "RESTAURANT_NAME",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "BUSINESS_NAME",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "ALSO_KNOWN_AS",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "LICENSE_NUMBER",
+				"type": "NUMBER",
+				"precision": 38,
+				"scale": 0
+			},
+			{
+				"name": "FACILITY_TYPE",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "RISK",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "INSPECTION_YEAR",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "INSPECTION_TYPE",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "INSPECTION_SCORE",
+				"type": "NUMBER",
+				"precision": 38,
+				"scale": 0
+			},
+			{
+				"name": "INSPECTION_DATE",
+				"type": "DATE"
+			},
+			{
+				"name": "INSPECTION_RESULTS",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "OUTCOME_CATEGORY",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "STREET_NUMBER",
+				"type": "NUMBER",
+				"precision": 38,
+				"scale": 0
+			},
+			{
+				"name": "STREET_NAME",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "STREET_DIRECTION",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "STREET_UNIT",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "STREET_TYPE",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "STREET_ADDRESS",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "ADDRESS",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "ZIP_CODE",
+				"type": "NUMBER",
+				"precision": 38,
+				"scale": 0
+			},
+			{
+				"name": "CITY",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "STATE",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "LATITUDE",
+				"type": "FLOAT"
+			},
+			{
+				"name": "LONGITUDE",
+				"type": "FLOAT"
+			},
+			{
+				"name": "LOCATION",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "LOCATION_MISSING",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "GEO_MISSING",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "VIOLATION_COUNT",
+				"type": "NUMBER",
+				"precision": 38,
+				"scale": 0
+			},
+			{
+				"name": "TOTAL_VIOLATION_POINTS",
+				"type": "NUMBER",
+				"precision": 38,
+				"scale": 0
+			},
+			{
+				"name": "VIOLATIONS",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "SINGLE_VIOLATION_ENTRY",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "VIOLATION_DESCRIPTION",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "VIOLATION_NUMBER",
+				"type": "NUMBER",
+				"precision": 38,
+				"scale": 0
+			},
+			{
+				"name": "SOURCE_CITY",
+				"type": "VARCHAR"
+			}
+		],
+		"typeProperties": {
+			"schema": "FOOD_SCHEMA",
+			"table": "STAGE_INSPECTIONS_UNIFIED"
+		}
+	}
+}
