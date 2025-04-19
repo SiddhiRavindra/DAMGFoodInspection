@@ -17,6 +17,20 @@
 						"type": "DatasetReference"
 					},
 					"name": "source2"
+				},
+				{
+					"dataset": {
+						"referenceName": "SF_Violation_v2",
+						"type": "DatasetReference"
+					},
+					"name": "sourcemaxid"
+				},
+				{
+					"dataset": {
+						"referenceName": "SF_Violation_v2",
+						"type": "DatasetReference"
+					},
+					"name": "sourcedimviolation"
 				}
 			],
 			"sinks": [
@@ -42,10 +56,22 @@
 					"name": "derivedColumn1"
 				},
 				{
-					"name": "surrogateKey1"
+					"name": "select1"
 				},
 				{
-					"name": "select1"
+					"name": "join1"
+				},
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "join2"
+				},
+				{
+					"name": "select2"
+				},
+				{
+					"name": "surrogateKey1"
 				}
 			],
 			"scriptLines": [
@@ -104,14 +130,29 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'table') ~> source2",
+				"source(output(",
+				"          MAXVIOLATIONSK as decimal(38,0)",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     query: 'select NVL(MAX(VIOLATION_SK),0) as MaxViolationSK FROM FOOD_SCHEMA.DIM_VIOLATION_TEST',",
+				"     format: 'query') ~> sourcemaxid",
+				"source(output(",
+				"          VIOLATION_SK as decimal(38,0),",
+				"          VIOLATION_NUMBER as decimal(38,0),",
+				"          VIOLATION_DESCRIPTION as string,",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> sourcedimviolation",
 				"source1 derive(DI_JOB_ID = \"ChicagoJob\") ~> DerivedChicago",
 				"source2 derive(DI_JOB_ID = \"DallasJob\") ~> DerivedDallas",
 				"DerivedChicago, DerivedDallas union(byName: true)~> union1",
-				"union1 derive(DI_LOAD_DATE = currentDate()) ~> derivedColumn1",
-				"derivedColumn1 keyGenerate(output(VIOLATION_SK as long),",
-				"     startAt: 1L,",
-				"     stepValue: 1L) ~> surrogateKey1",
-				"surrogateKey1 select(mapColumn(",
+				"surrogateKey1 derive(DI_LOAD_DATE = currentDate(),",
+				"          VIOLATION_SK = MAXVIOLATIONSK+rownum) ~> derivedColumn1",
+				"derivedColumn1 select(mapColumn(",
 				"          VIOLATION_SK,",
 				"          VIOLATION_NUMBER,",
 				"          VIOLATION_DESCRIPTION,",
@@ -120,6 +161,35 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select1",
+				"union1, sourcemaxid join(1==1,",
+				"     joinType:'cross',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"join1 aggregate(groupBy(VIOLATION_NUMBER,",
+				"          VIOLATION_DESCRIPTION,",
+				"          MAXVIOLATIONSK,",
+				"          DI_JOB_ID),",
+				"     CountRow = count(INSPECTION_ID)) ~> aggregate1",
+				"aggregate1, sourcedimviolation join(aggregate1@VIOLATION_NUMBER == sourcedimviolation@VIOLATION_NUMBER",
+				"     && aggregate1@VIOLATION_DESCRIPTION == sourcedimviolation@VIOLATION_DESCRIPTION,",
+				"     joinType:'left',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join2",
+				"join2 select(mapColumn(",
+				"          VIOLATION_NUMBER = aggregate1@VIOLATION_NUMBER,",
+				"          VIOLATION_DESCRIPTION = aggregate1@VIOLATION_DESCRIPTION,",
+				"          MAXVIOLATIONSK,",
+				"          DI_JOB_ID = aggregate1@DI_JOB_ID,",
+				"          VIOLATION_SK,",
+				"          CountRow",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"select2 keyGenerate(output(rownum as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> surrogateKey1",
 				"select1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
