@@ -169,7 +169,7 @@
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joindate",
-				"joindate, sourcedimlocation join(sourcedallas@CITY == sourcedimlocation@CITY,",
+				"joindate, sourcedimlocation join(ZIP_CODE == sourcedimlocation@ZIPCODE,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
