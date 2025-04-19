@@ -54,7 +54,15 @@
 					"name": "sourceDimDate"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "SF_FACT_INSPECTION",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
 			"transformations": [
 				{
 					"name": "DerivedChicago"
@@ -64,9 +72,6 @@
 				},
 				{
 					"name": "union1"
-				},
-				{
-					"name": "lookupRestaurant"
 				},
 				{
 					"name": "joinRestuarant"
@@ -84,7 +89,13 @@
 					"name": "joinViolation"
 				},
 				{
-					"name": "violationCount"
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "surrogateKey1"
+				},
+				{
+					"name": "select1"
 				}
 			],
 			"scriptLines": [
@@ -154,7 +165,7 @@
 				"     format: 'table') ~> sourceDimInspectionType",
 				"source(output(",
 				"          LOCATION_SK as decimal(38,0),",
-				"          ZIPCODE as decimal(38,0),",
+				"          ZIPCODE as string,",
 				"          LONGITUDE as double,",
 				"          LATITUDE as double,",
 				"          CITY as string,",
@@ -201,18 +212,14 @@
 				"     format: 'table') ~> sourceDimDate",
 				"sourceStageChicago derive(DI_JOB_ID = \"ChicagoJob\") ~> DerivedChicago",
 				"sourceDallasStage derive(DI_JOB_ID = \"DallasJob\") ~> DerivedDallas",
-				"DerivedChicago, DerivedDallas union(byName: true)~> union1",
-				"violationCount, sourceDimRestaurant lookup(union1@CITY == sourceDimRestaurant@CITY,",
-				"     multiple: false,",
-				"     pickup: 'any',",
-				"     broadcast: 'auto')~> lookupRestaurant",
+				"surrogateKey1, DerivedDallas union(byName: true)~> union1",
 				"union1, sourceDimRestaurant join(union1@RESTAURANT_NAME == sourceDimRestaurant@RESTAURANT_NAME,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinRestuarant",
 				"joinRestuarant, sourceDimDate join(union1@INSPECTION_DATE == sourceDimDate@INSPECTION_DATE,",
-				"     joinType:'inner',",
+				"     joinType:'outer',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinDate",
@@ -221,8 +228,8 @@
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinLocation",
-				"joinLocation, sourceDimInspectionType join(union1@INSPECTION_TYPE == sourceDimInspectionType@INSPECTION_TYPE,",
-				"     joinType:'inner',",
+				"joinLocation, sourceDimInspectionType join(INSPECTION_ID == INSPECTIONTYPE_SK,",
+				"     joinType:'left',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinInspectionType",
@@ -231,11 +238,67 @@
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinViolation",
-				"joinViolation, sourceDimViolation join(union1@VIOLATION_NUMBER == sourceDimViolation@VIOLATION_NUMBER,",
-				"     joinType:'inner',",
-				"     matchType:'exact',",
-				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> violationCount"
+				"joinViolation derive(DI_JOB_ID = uuid(),",
+				"          DI_LOAD_DT = currentDate(),",
+				"          Inspection_sk = rownum,",
+				"          RESTAURANT_SK = RESTAURANT_SK,",
+				"          DATE_SK = DATE_SK,",
+				"          LOCATION_SK = LOCATION_SK,",
+				"          INSPECTIONTYPE_SK = INSPECTIONTYPE_SK,",
+				"          VIOLATION_SK = VIOLATION_SK,",
+				"          VIOLATION_COUNT = VIOLATION_COUNT) ~> derivedColumn1",
+				"DerivedChicago keyGenerate(output(rownum as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> surrogateKey1",
+				"derivedColumn1 select(mapColumn(",
+				"          inspection_SK = Inspection_sk,",
+				"          VIOLATION_COUNT,",
+				"          DI_JOB_ID,",
+				"          RESTAURANT_SK,",
+				"          DATE_SK,",
+				"          LOCATION_SK,",
+				"          CITY = sourceDimLocation@CITY,",
+				"          STATE = sourceDimLocation@STATE,",
+				"          INSPECTIONTYPE_SK,",
+				"          VIOLATION_SK,",
+				"          DI_LOAD_DT",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          INSPECTION_SK as decimal(38,0),",
+				"          RESTAURANT_SK as decimal(38,0),",
+				"          DATE_SK as decimal(38,0),",
+				"          LOCATION_SK as decimal(38,0),",
+				"          INSPECTIONTYPE_SK as decimal(38,0),",
+				"          VIOLATION_SK as decimal(38,0),",
+				"          VIOLATION_COUNT as decimal(38,0),",
+				"          CITY as string,",
+				"          STATE as string,",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     truncate:true,",
+				"     format: 'table',",
+				"     stageInsert: true,",
+				"     mapColumn(",
+				"          INSPECTION_SK = inspection_SK,",
+				"          RESTAURANT_SK,",
+				"          DATE_SK,",
+				"          LOCATION_SK,",
+				"          VIOLATION_SK,",
+				"          VIOLATION_COUNT,",
+				"          CITY,",
+				"          STATE,",
+				"          DI_JOB_ID,",
+				"          DI_LOAD_DATE = DI_LOAD_DT",
+				"     )) ~> sink1"
 			]
 		}
 	}
