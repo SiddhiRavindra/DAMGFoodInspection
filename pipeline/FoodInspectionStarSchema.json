@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Data flow1",
+				"name": "DF_InspectionType",
 				"type": "ExecuteDataFlow",
 				"state": "Inactive",
 				"onInactiveMarkAs": "Succeeded",
@@ -29,7 +29,7 @@
 				}
 			},
 			{
-				"name": "Data flow2",
+				"name": "DF_Violation",
 				"type": "ExecuteDataFlow",
 				"state": "Inactive",
 				"onInactiveMarkAs": "Succeeded",
@@ -55,13 +55,11 @@
 				}
 			},
 			{
-				"name": "Data flow3",
+				"name": "DF_Location",
 				"type": "ExecuteDataFlow",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
-					"timeout": "0.00:30:00",
+					"timeout": "0.12:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
 					"secureOutput": false,
@@ -81,7 +79,7 @@
 				}
 			},
 			{
-				"name": "DataflowDimResturant",
+				"name": "DF_FactFoodInspection",
 				"type": "ExecuteDataFlow",
 				"dependsOn": [],
 				"policy": {
@@ -94,11 +92,8 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "dataflowDIMRESTAURANT",
-						"type": "DataFlowReference",
-						"parameters": {
-							"jobid": "uuid()"
-						}
+						"referenceName": "Fact_FoodInspection",
+						"type": "DataFlowReference"
 					},
 					"compute": {
 						"coreCount": 8,
