@@ -124,7 +124,7 @@
 				"     validateSchema: false,",
 				"     input(",
 				"          VIOLATION_SK as decimal(38,0),",
-				"          VIOLATION_NUMBER as string,",
+				"          VIOLATION_NUMBER as decimal(38,0),",
 				"          VIOLATION_DESCRIPTION as string,",
 				"          DI_JOB_ID as string,",
 				"          DI_LOAD_DATE as date",
