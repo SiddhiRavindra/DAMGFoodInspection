@@ -64,9 +64,6 @@
 					"name": "joinRestuarant"
 				},
 				{
-					"name": "joinLocation"
-				},
-				{
 					"name": "joinInspectionType"
 				},
 				{
@@ -82,7 +79,10 @@
 					"name": "select1"
 				},
 				{
-					"name": "surrogateKeyDate"
+					"name": "surrogateKeyLoaction"
+				},
+				{
+					"name": "join1"
 				}
 			],
 			"scriptLines": [
@@ -171,17 +171,12 @@
 				"     validateSchema: false,",
 				"     format: 'table') ~> sourceDimDate",
 				"sourceStageChicago derive(DI_JOB_ID = \"ChicagoJob\") ~> DerivedChicago",
-				"surrogateKeyDate, sourceDimRestaurant join(sourceStageChicago@RESTAURANT_NAME == sourceDimRestaurant@RESTAURANT_NAME,",
+				"surrogateKeyLoaction, sourceDimRestaurant join(sourceStageChicago@RESTAURANT_NAME == sourceDimRestaurant@RESTAURANT_NAME,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinRestuarant",
-				"joinRestuarant, sourceDimLocation join(sourceStageChicago@CITY == sourceDimLocation@CITY,",
-				"     joinType:'inner',",
-				"     matchType:'exact',",
-				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> joinLocation",
-				"joinLocation, sourceDimInspectionType join(sourceStageChicago@INSPECTION_TYPE == sourceDimInspectionType@INSPECTION_TYPE,",
+				"join1, sourceDimInspectionType join(sourceStageChicago@INSPECTION_TYPE == sourceDimInspectionType@INSPECTION_TYPE,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
@@ -195,8 +190,8 @@
 				"          DI_LOAD_DT = currentDate(),",
 				"          Inspection_sk = rownum,",
 				"          RESTAURANT_SK = RESTAURANT_SK,",
-				"          DATE_SK = datesk,",
-				"          LOCATION_SK = LOCATION_SK,",
+				"          DATE_SK = DATE_SK,",
+				"          LOCATION_SK = locationsk,",
 				"          INSPECTIONTYPE_SK = INSPECTIONTYPE_SK,",
 				"          VIOLATION_SK = VIOLATION_SK,",
 				"          VIOLATION_COUNT = VIOLATION_COUNT) ~> derivedColumn1",
@@ -218,9 +213,14 @@
 				"     ),",
 				"     skipDuplicateMapInputs: false,",
 				"     skipDuplicateMapOutputs: false) ~> select1",
-				"surrogateKey1 keyGenerate(output(datesk as long),",
+				"surrogateKey1 keyGenerate(output(locationsk as long),",
 				"     startAt: 1L,",
-				"     stepValue: 1L) ~> surrogateKeyDate",
+				"     stepValue: 1L) ~> surrogateKeyLoaction",
+				"joinRestuarant, sourceDimDate join(sourceStageChicago@INSPECTION_DATE == sourceDimDate@INSPECTION_DATE,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
 				"select1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
