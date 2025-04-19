@@ -23,7 +23,42 @@
 						"referenceName": "SFDIMRESTAURANT",
 						"type": "DatasetReference"
 					},
-					"name": "sourcedimrest"
+					"name": "DimRestaurant"
+				},
+				{
+					"dataset": {
+						"referenceName": "SF_Dim_Location",
+						"type": "DatasetReference"
+					},
+					"name": "DimLocation"
+				},
+				{
+					"dataset": {
+						"referenceName": "SF_DIM_Inspection_Type",
+						"type": "DatasetReference"
+					},
+					"name": "DimInspectiontype"
+				},
+				{
+					"dataset": {
+						"referenceName": "SfDimDate",
+						"type": "DatasetReference"
+					},
+					"name": "DimDate"
+				},
+				{
+					"dataset": {
+						"referenceName": "SF_Dim_Violation",
+						"type": "DatasetReference"
+					},
+					"name": "DimViolation"
+				},
+				{
+					"dataset": {
+						"referenceName": "SF_FACT_INSPECTION",
+						"type": "DatasetReference"
+					},
+					"name": "Factinspection"
 				}
 			],
 			"sinks": [],
@@ -38,7 +73,19 @@
 					"name": "union1"
 				},
 				{
-					"name": "join1"
+					"name": "joinrestaurant"
+				},
+				{
+					"name": "joinlocation"
+				},
+				{
+					"name": "joininspection"
+				},
+				{
+					"name": "joindim"
+				},
+				{
+					"name": "joinviolation"
 				}
 			],
 			"scriptLines": [
@@ -109,17 +156,87 @@
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     format: 'table') ~> sourcedimrest",
+				"     format: 'table') ~> DimRestaurant",
+				"source(output(",
+				"          LOCATION_SK as decimal(38,0),",
+				"          ZIPCODE as decimal(38,0),",
+				"          LONGITUDE as double,",
+				"          LATITUDE as double,",
+				"          CITY as string,",
+				"          STATE as string,",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> DimLocation",
+				"source(output(",
+				"          INSPECTIONTYPE_SK as decimal(38,0),",
+				"          INSPECTION_TYPE as string,",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> DimInspectiontype",
+				"source(output(",
+				"          DATE_SK as decimal(38,0),",
+				"          INSPECTION_DATE as date,",
+				"          INSPECTION_MONTH as string,",
+				"          INSPECTION_YEAR as decimal(38,0),",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> DimDate",
+				"source(output(",
+				"          VIOLATION_SK as decimal(38,0),",
+				"          VIOLATION_NUMBER as decimal(38,0),",
+				"          VIOLATION_DESCRIPTION as string,",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> DimViolation",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     query: 'Select NVL(MAX(INSPECTION_SK, 0) as MaxFactSK FROM FOOD_SCHEMA.FACT_INSPECTION',",
+				"     format: 'query') ~> Factinspection",
 				"sourcechicago derive(DI_JOB_ID = \"ChicagoJob\") ~> derivedColumn1",
 				"sourcedallas derive(DI_JOB_ID = \"DallasJob\") ~> derivedColumn2",
 				"derivedColumn1, derivedColumn2 union(byName: true)~> union1",
-				"union1, sourcedimrest join(union1@RESTAURANT_NAME == sourcedimrest@RESTAURANT_NAME",
-				"     && union1@STREET_ADDRESS == sourcedimrest@STREET_ADDRESS",
-				"     && union1@CITY == sourcedimrest@CITY,",
+				"union1, DimRestaurant join(union1@RESTAURANT_NAME == DimRestaurant@RESTAURANT_NAME",
+				"     && union1@STREET_ADDRESS == DimRestaurant@STREET_ADDRESS",
+				"     && union1@CITY == DimRestaurant@CITY,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> join1"
+				"     broadcast: 'auto')~> joinrestaurant",
+				"joinrestaurant, DimLocation join(ZIP_CODE == DimLocation@ZIPCODE",
+				"     && union1@LONGITUDE == DimLocation@LONGITUDE",
+				"     && union1@LATITUDE == DimLocation@LATITUDE,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinlocation",
+				"joinlocation, DimInspectiontype join(union1@INSPECTION_TYPE == DimInspectiontype@INSPECTION_TYPE,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joininspection",
+				"joininspection, DimDate join(union1@INSPECTION_DATE == DimDate@INSPECTION_DATE,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joindim",
+				"joindim, DimViolation join(union1@VIOLATION_NUMBER == DimViolation@VIOLATION_NUMBER",
+				"     && union1@VIOLATION_DESCRIPTION == DimViolation@VIOLATION_DESCRIPTION,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinviolation"
 			]
 		}
 	}
