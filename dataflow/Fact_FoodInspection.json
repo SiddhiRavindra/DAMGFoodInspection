@@ -83,6 +83,12 @@
 				},
 				{
 					"name": "joinDate"
+				},
+				{
+					"name": "surrogateKey2"
+				},
+				{
+					"name": "joinloc"
 				}
 			],
 			"scriptLines": [
@@ -171,7 +177,7 @@
 				"     validateSchema: false,",
 				"     format: 'table') ~> sourceDimDate",
 				"sourceStageChicago derive(DI_JOB_ID = \"ChicagoJob\") ~> DerivedChicago",
-				"surrogateKeyLoaction, sourceDimRestaurant join(sourceStageChicago@RESTAURANT_NAME == sourceDimRestaurant@RESTAURANT_NAME,",
+				"surrogateKey2, sourceDimRestaurant join(sourceStageChicago@RESTAURANT_NAME == sourceDimRestaurant@RESTAURANT_NAME,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
@@ -181,7 +187,7 @@
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinInspectionType",
-				"joinInspectionType, sourceDimViolation join(VIOLATIONS == sourceDimViolation@VIOLATION_DESCRIPTION,",
+				"joinInspectionType, sourceDimViolation join(sourceStageChicago@VIOLATION_NUMBER == sourceDimViolation@VIOLATION_NUMBER,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
@@ -191,7 +197,7 @@
 				"          Inspection_sk = rownum,",
 				"          RESTAURANT_SK = RESTAURANT_SK,",
 				"          DATE_SK = DATE_SK,",
-				"          LOCATION_SK = locationsk,",
+				"          LOCATION_SK = LOCATION_SK,",
 				"          INSPECTIONTYPE_SK = INSPECTIONTYPE_SK,",
 				"          VIOLATION_SK = VIOLATION_SK,",
 				"          VIOLATION_COUNT = VIOLATION_COUNT) ~> derivedColumn1",
@@ -216,11 +222,19 @@
 				"surrogateKey1 keyGenerate(output(locationsk as long),",
 				"     startAt: 1L,",
 				"     stepValue: 1L) ~> surrogateKeyLoaction",
-				"joinRestuarant, sourceDimDate join(sourceStageChicago@INSPECTION_DATE == sourceDimDate@INSPECTION_DATE,",
+				"joinloc, sourceDimDate join(sourceStageChicago@INSPECTION_DATE == sourceDimDate@INSPECTION_DATE,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinDate",
+				"surrogateKeyLoaction keyGenerate(output(violationsk as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> surrogateKey2",
+				"joinRestuarant, sourceDimLocation join(sourceDimRestaurant@ZIPCODE == sourceDimLocation@ZIPCODE,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinloc",
 				"select1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
