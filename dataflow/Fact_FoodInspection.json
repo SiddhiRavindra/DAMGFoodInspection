@@ -64,9 +64,6 @@
 					"name": "joinRestuarant"
 				},
 				{
-					"name": "joinDate"
-				},
-				{
 					"name": "joinLocation"
 				},
 				{
@@ -83,6 +80,9 @@
 				},
 				{
 					"name": "select1"
+				},
+				{
+					"name": "surrogateKeyDate"
 				}
 			],
 			"scriptLines": [
@@ -171,17 +171,12 @@
 				"     validateSchema: false,",
 				"     format: 'table') ~> sourceDimDate",
 				"sourceStageChicago derive(DI_JOB_ID = \"ChicagoJob\") ~> DerivedChicago",
-				"surrogateKey1, sourceDimRestaurant join(sourceStageChicago@RESTAURANT_NAME == sourceDimRestaurant@RESTAURANT_NAME,",
+				"surrogateKeyDate, sourceDimRestaurant join(sourceStageChicago@RESTAURANT_NAME == sourceDimRestaurant@RESTAURANT_NAME,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinRestuarant",
-				"joinRestuarant, sourceDimDate join(sourceStageChicago@INSPECTION_DATE == sourceDimDate@INSPECTION_DATE,",
-				"     joinType:'inner',",
-				"     matchType:'exact',",
-				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> joinDate",
-				"joinDate, sourceDimLocation join(sourceStageChicago@CITY == sourceDimLocation@CITY,",
+				"joinRestuarant, sourceDimLocation join(sourceStageChicago@CITY == sourceDimLocation@CITY,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
@@ -200,7 +195,7 @@
 				"          DI_LOAD_DT = currentDate(),",
 				"          Inspection_sk = rownum,",
 				"          RESTAURANT_SK = RESTAURANT_SK,",
-				"          DATE_SK = DATE_SK,",
+				"          DATE_SK = datesk,",
 				"          LOCATION_SK = LOCATION_SK,",
 				"          INSPECTIONTYPE_SK = INSPECTIONTYPE_SK,",
 				"          VIOLATION_SK = VIOLATION_SK,",
@@ -223,6 +218,9 @@
 				"     ),",
 				"     skipDuplicateMapInputs: false,",
 				"     skipDuplicateMapOutputs: false) ~> select1",
+				"surrogateKey1 keyGenerate(output(datesk as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> surrogateKeyDate",
 				"select1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
