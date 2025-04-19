@@ -96,9 +96,6 @@
 				},
 				{
 					"name": "select1"
-				},
-				{
-					"name": "filter1"
 				}
 			],
 			"scriptLines": [
@@ -217,12 +214,12 @@
 				"sourceDallasStage derive(DI_JOB_ID = \"DallasJob\") ~> DerivedDallas",
 				"surrogateKey1, DerivedDallas union(byName: true)~> union1",
 				"union1, sourceDimRestaurant join(union1@RESTAURANT_NAME == sourceDimRestaurant@RESTAURANT_NAME,",
-				"     joinType:'inner',",
+				"     joinType:'right',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinRestuarant",
-				"joinRestuarant, sourceDimDate join(union1@INSPECTION_DATE == sourceDimDate@INSPECTION_DATE,",
-				"     joinType:'outer',",
+				"joinRestuarant, sourceDimDate join(union1@INSPECTION_DATE == DATE_SK,",
+				"     joinType:'left',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinDate",
@@ -268,9 +265,7 @@
 				"     ),",
 				"     skipDuplicateMapInputs: false,",
 				"     skipDuplicateMapOutputs: false) ~> select1",
-				"select1 filter(inspection_SK <= 20000",
-				" ) ~> filter1",
-				"filter1 sink(allowSchemaDrift: true,",
+				"select1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          INSPECTION_SK as decimal(38,0),",
