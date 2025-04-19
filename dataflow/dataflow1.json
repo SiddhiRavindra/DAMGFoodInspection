@@ -101,7 +101,7 @@
 					"name": "surrogateKey1"
 				},
 				{
-					"name": "derivedColumn2"
+					"name": "filter1"
 				}
 			],
 			"scriptLines": [
@@ -272,9 +272,8 @@
 				"select2 keyGenerate(output(INSPECTION_SK as long),",
 				"     startAt: 1L,",
 				"     stepValue: 1L) ~> surrogateKey1",
-				"surrogateKey1 derive(INSPECTION_SK = INSPECTION_SK <= 50000",
-				") ~> derivedColumn2",
-				"derivedColumn2 sink(allowSchemaDrift: true,",
+				"surrogateKey1 filter(INSPECTION_SK <= 50000) ~> filter1",
+				"filter1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          INSPECTION_SK as decimal(38,0),",
