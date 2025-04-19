@@ -24,6 +24,9 @@
 						"type": "DatasetReference"
 					},
 					"name": "sourceDimrest"
+				},
+				{
+					"name": "source1"
 				}
 			],
 			"sinks": [],
@@ -116,6 +119,8 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'table') ~> sourceDimrest",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false) ~> source1",
 				"sourceChicago derive(DI_JOB_ID = \"ChicagoJob\") ~> DerivedChicago",
 				"sourceDallas derive(DI_JOB_ID = \"DallasJob\") ~> DerivedDallas",
 				"DerivedChicago, DerivedDallas union(byName: true)~> union1",
