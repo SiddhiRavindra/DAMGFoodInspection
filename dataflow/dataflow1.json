@@ -57,7 +57,7 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "SF_FACT_INSPECTION",
+						"referenceName": "SF_Fact_v2",
 						"type": "DatasetReference"
 					},
 					"name": "sink1"
@@ -278,6 +278,7 @@
 				"          LOCATION_SK as decimal(38,0),",
 				"          INSPECTIONTYPE_SK as decimal(38,0),",
 				"          VIOLATION_SK as decimal(38,0),",
+				"          INSPECTION_TYPE as string,",
 				"          VIOLATION_COUNT as decimal(38,0),",
 				"          CITY as string,",
 				"          STATE as string,",
@@ -303,7 +304,8 @@
 				"          CITY,",
 				"          STATE,",
 				"          DI_JOB_ID,",
-				"          DI_LOAD_DATE",
+				"          DI_LOAD_DATE,",
+				"          INSPECTION_TYPE",
 				"     )) ~> sink1"
 			]
 		}
