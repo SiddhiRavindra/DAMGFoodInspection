@@ -65,9 +65,6 @@
 			],
 			"transformations": [
 				{
-					"name": "DerivedChicago"
-				},
-				{
 					"name": "joinRestuarant"
 				},
 				{
@@ -207,7 +204,6 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'table') ~> sourceStgDallas",
-				"sourceStageChicago derive(DI_JOB_ID = \"ChicagoJob\") ~> DerivedChicago",
 				"surrogateKey1, sourceDimRestaurant join(sourceStageChicago@RESTAURANT_NAME == sourceDimRestaurant@RESTAURANT_NAME",
 				"     && SOURCE_CITY == sourceDimRestaurant@CITY",
 				"     && sourceStageChicago@STATE == sourceDimRestaurant@STATE",
@@ -265,7 +261,7 @@
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinloc",
-				"DerivedChicago, sourceStgDallas union(byName: true)~> union1",
+				"sourceStageChicago, sourceStgDallas union(byName: true)~> union1",
 				"select1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
