@@ -6,17 +6,10 @@
 			"sources": [
 				{
 					"dataset": {
-						"referenceName": "ChicagoSFSink",
-						"type": "DatasetReference"
-					},
-					"name": "sourceStageChicago"
-				},
-				{
-					"dataset": {
 						"referenceName": "DallasSFSink",
 						"type": "DatasetReference"
 					},
-					"name": "sourceDallasStage"
+					"name": "sourceStageChicago"
 				},
 				{
 					"dataset": {
@@ -68,12 +61,6 @@
 					"name": "DerivedChicago"
 				},
 				{
-					"name": "DerivedDallas"
-				},
-				{
-					"name": "union1"
-				},
-				{
 					"name": "joinRestuarant"
 				},
 				{
@@ -100,34 +87,6 @@
 			],
 			"scriptLines": [
 				"source(output(",
-				"          INSPECTION_ID as decimal(38,0),",
-				"          RESTAURANT_NAME as string,",
-				"          ALSO_KNOWN_AS as string,",
-				"          LICENSE_NUMBER as decimal(38,0),",
-				"          FACILITY_TYPE as string,",
-				"          RISK as string,",
-				"          STREET_ADDRESS as string,",
-				"          CITY as string,",
-				"          STATE as string,",
-				"          ZIP_CODE as decimal(38,0),",
-				"          INSPECTION_DATE as date,",
-				"          INSPECTION_TYPE as string,",
-				"          INSPECTION_RESULTS as string,",
-				"          VIOLATIONS as string,",
-				"          LATITUDE as double,",
-				"          LONGITUDE as double,",
-				"          LOCATION as string,",
-				"          GEO_MISSING as string,",
-				"          VIOLATION_COUNT as decimal(38,0),",
-				"          OUTCOME_CATEGORY as string,",
-				"          SINGLE_VIOLATION_ENTRY as string,",
-				"          VIOLATION_DESCRIPTION as string,",
-				"          VIOLATION_NUMBER as decimal(38,0)",
-				"     ),",
-				"     allowSchemaDrift: true,",
-				"     validateSchema: false,",
-				"     format: 'table') ~> sourceStageChicago",
-				"source(output(",
 				"          RECORDID as decimal(38,0),",
 				"          RESTAURANT_NAME as string,",
 				"          INSPECTION_YEAR as string,",
@@ -153,7 +112,7 @@
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     format: 'table') ~> sourceDallasStage",
+				"     format: 'table') ~> sourceStageChicago",
 				"source(output(",
 				"          INSPECTIONTYPE_SK as decimal(38,0),",
 				"          INSPECTION_TYPE as string,",
@@ -211,29 +170,27 @@
 				"     validateSchema: false,",
 				"     format: 'table') ~> sourceDimDate",
 				"sourceStageChicago derive(DI_JOB_ID = \"ChicagoJob\") ~> DerivedChicago",
-				"sourceDallasStage derive(DI_JOB_ID = \"DallasJob\") ~> DerivedDallas",
-				"surrogateKey1, DerivedDallas union(byName: true)~> union1",
-				"union1, sourceDimRestaurant join(union1@RESTAURANT_NAME == sourceDimRestaurant@RESTAURANT_NAME,",
-				"     joinType:'right',",
+				"surrogateKey1, sourceDimRestaurant join(sourceStageChicago@RESTAURANT_NAME == sourceDimRestaurant@RESTAURANT_NAME,",
+				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinRestuarant",
-				"joinRestuarant, sourceDimDate join(union1@INSPECTION_DATE == DATE_SK,",
-				"     joinType:'left',",
+				"joinRestuarant, sourceDimDate join(sourceStageChicago@INSPECTION_DATE == sourceDimDate@INSPECTION_DATE,",
+				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinDate",
-				"joinDate, sourceDimLocation join(union1@CITY == sourceDimLocation@CITY,",
+				"joinDate, sourceDimLocation join(sourceDimRestaurant@ZIPCODE == sourceDimLocation@ZIPCODE,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinLocation",
-				"joinLocation, sourceDimInspectionType join(INSPECTION_ID == INSPECTIONTYPE_SK,",
-				"     joinType:'left',",
+				"joinLocation, sourceDimInspectionType join(sourceStageChicago@INSPECTION_TYPE == sourceDimInspectionType@INSPECTION_TYPE,",
+				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinInspectionType",
-				"joinInspectionType, sourceDimViolation join(union1@VIOLATION_NUMBER == sourceDimViolation@VIOLATION_NUMBER,",
+				"joinInspectionType, sourceDimViolation join(sourceStageChicago@VIOLATION_NUMBER == sourceDimViolation@VIOLATION_NUMBER,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
