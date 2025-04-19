@@ -42,6 +42,9 @@
 				},
 				{
 					"name": "lookuprest"
+				},
+				{
+					"name": "lookupdate"
 				}
 			],
 			"scriptLines": [
@@ -130,10 +133,14 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select1",
-				"select1, sourceDimrest lookup(select1@CITY == sourceDimrest@CITY,",
+				"select1, sourceDimrest lookup(select1@RESTAURANT_NAME == sourceDimrest@RESTAURANT_NAME,",
 				"     multiple: false,",
 				"     pickup: 'any',",
-				"     broadcast: 'auto')~> lookuprest"
+				"     broadcast: 'auto')~> lookuprest",
+				"lookuprest lookup(ERROR_FUNCTION('') == ERROR_FUNCTION(''),",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookupdate"
 			]
 		}
 	}
