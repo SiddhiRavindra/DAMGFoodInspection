@@ -90,6 +90,12 @@
 				},
 				{
 					"name": "union1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "derivedColumn3"
 				}
 			],
 			"scriptLines": [
@@ -261,7 +267,9 @@
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinloc",
-				"sourceStageChicago, sourceStgDallas union(byName: true)~> union1",
+				"sourceStgDallas, derivedColumn3 union(byName: false)~> union1",
+				"sourceStageChicago derive(DI_JOB_ID = 'ChicagoJob') ~> derivedColumn2",
+				"sourceStgDallas derive(DI_JOB_ID = 'Dallas') ~> derivedColumn3",
 				"select1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",

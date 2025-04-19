@@ -17,6 +17,13 @@
 						"type": "DatasetReference"
 					},
 					"name": "sourceDIMRESTAURANTCHICAGO"
+				},
+				{
+					"dataset": {
+						"referenceName": "SF_Restaurant_v2",
+						"type": "DatasetReference"
+					},
+					"name": "sourceMaxId"
 				}
 			],
 			"sinks": [
@@ -50,6 +57,9 @@
 				},
 				{
 					"name": "select1"
+				},
+				{
+					"name": "join1"
 				}
 			],
 			"scriptLines": [
@@ -111,7 +121,11 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'table') ~> sourceDIMRESTAURANTCHICAGO",
-				"union derive(DI_LOAD_DT = currentTimestamp()) ~> derivedColumn1",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     query: 'select  NVL(MAX())',",
+				"     format: 'query') ~> sourceMaxId",
+				"join1 derive(DI_LOAD_DT = currentTimestamp()) ~> derivedColumn1",
 				"sourceDIMRESTAURANTDALLAS derive(DI_JOD_ID = \"DallasJob\") ~> derivedColumn2",
 				"sourceDIMRESTAURANTCHICAGO derive(DI_JOD_ID = \"ChicagoJob\") ~> derivedColumn3",
 				"derivedColumn2, derivedColumn3 union(byName: true)~> union",
@@ -127,6 +141,11 @@
 				"     ),",
 				"     skipDuplicateMapInputs: false,",
 				"     skipDuplicateMapOutputs: false) ~> select1",
+				"union join(ERROR_FUNCTION('') == ERROR_FUNCTION(''),",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
 				"select1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
