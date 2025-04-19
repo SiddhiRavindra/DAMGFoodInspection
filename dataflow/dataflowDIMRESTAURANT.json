@@ -1,0 +1,184 @@
+{
+	"name": "dataflowDIMRESTAURANT",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DallasSFSink",
+						"type": "DatasetReference"
+					},
+					"name": "sourceDIMRESTAURANTDALLAS"
+				},
+				{
+					"dataset": {
+						"referenceName": "ChicagoSFSink",
+						"type": "DatasetReference"
+					},
+					"name": "sourceDIMRESTAURANTCHICAGO"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "SFDIMRESTAURANT",
+						"type": "DatasetReference"
+					},
+					"name": "sinkDALLAS"
+				},
+				{
+					"dataset": {
+						"referenceName": "SFDIMRESTAURANT",
+						"type": "DatasetReference"
+					},
+					"name": "sinkChicago"
+				}
+			],
+			"transformations": [
+				{
+					"name": "surrogateKey"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "surrogateKeyChicago"
+				},
+				{
+					"name": "derivedColumn2"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     jobid as string (uuid())",
+				"}",
+				"source(output(",
+				"          RECORDID as decimal(38,0),",
+				"          RESTAURANT_NAME as string,",
+				"          INSPECTION_YEAR as string,",
+				"          INSPECTION_TYPE as string,",
+				"          INSPECTION_SCORE as decimal(38,0),",
+				"          INSPECTION_DATE as date,",
+				"          STREET_NUMBER as decimal(38,0),",
+				"          STREET_NAME as string,",
+				"          STREET_DIRECTION as string,",
+				"          STREET_ADDRESS as string,",
+				"          STREET_UNIT as string,",
+				"          STREET_TYPE as string,",
+				"          ZIP_CODE as decimal(38,0),",
+				"          CITY as string,",
+				"          STATE as string,",
+				"          LATITUDE as double,",
+				"          LONGITUDE as double,",
+				"          VIOLATION_COUNT as decimal(38,0),",
+				"          TOTAL_VIOLATION_POINTS as decimal(38,0),",
+				"          LOCATION_MISSING as string,",
+				"          VIOLATION_DESCRIPTION as string,",
+				"          VIOLATION_NUMBER as decimal(38,0)",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> sourceDIMRESTAURANTDALLAS",
+				"source(output(",
+				"          INSPECTION_ID as decimal(38,0),",
+				"          BUSINESS_NAME as string,",
+				"          ALSO_KNOWN_AS as string,",
+				"          LICENSE_NUMBER as decimal(38,0),",
+				"          FACILITY_TYPE as string,",
+				"          RISK as string,",
+				"          ADDRESS as string,",
+				"          CITY as string,",
+				"          STATE as string,",
+				"          ZIP_CODE as decimal(38,0),",
+				"          INSPECTION_DATE as date,",
+				"          INSPECTION_TYPE as string,",
+				"          INSPECTION_RESULTS as string,",
+				"          VIOLATIONS as string,",
+				"          LATITUDE as double,",
+				"          LONGITUDE as double,",
+				"          LOCATION as string,",
+				"          GEO_MISSING as string,",
+				"          VIOLATION_COUNT as decimal(38,0),",
+				"          OUTCOME_CATEGORY as string,",
+				"          SINGLE_VIOLATION_ENTRY as string,",
+				"          VIOLATION_DESCRIPTION as string,",
+				"          VIOLATION_NUMBER as decimal(38,0)",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> sourceDIMRESTAURANTCHICAGO",
+				"sourceDIMRESTAURANTDALLAS keyGenerate(output(ROWNUM as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> surrogateKey",
+				"surrogateKey derive(DI_JOB_ID = uuid(),",
+				"          DI_LOAD_DT = currentTimestamp()) ~> derivedColumn1",
+				"sourceDIMRESTAURANTCHICAGO keyGenerate(output(ROWNUM as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> surrogateKeyChicago",
+				"surrogateKeyChicago derive(DI_JOB_ID = $jobid,",
+				"          DI_LOAD_DT = currentTimestamp()) ~> derivedColumn2",
+				"derivedColumn1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          RESTAURANT_SK as decimal(38,0),",
+				"          RESTAURANT_NAME as string,",
+				"          STREET_ADDRESS as string,",
+				"          ZIPCODE as string,",
+				"          CITY as string,",
+				"          STATE as string,",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     truncate:true,",
+				"     format: 'table',",
+				"     stageInsert: true,",
+				"     mapColumn(",
+				"          RESTAURANT_SK = RECORDID,",
+				"          RESTAURANT_NAME,",
+				"          STREET_ADDRESS,",
+				"          ZIPCODE = ZIP_CODE,",
+				"          CITY,",
+				"          STATE,",
+				"          DI_JOB_ID,",
+				"          DI_LOAD_DATE = DI_LOAD_DT",
+				"     )) ~> sinkDALLAS",
+				"derivedColumn2 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          RESTAURANT_SK as decimal(38,0),",
+				"          RESTAURANT_NAME as string,",
+				"          STREET_ADDRESS as string,",
+				"          ZIPCODE as string,",
+				"          CITY as string,",
+				"          STATE as string,",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     truncate:true,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     stageInsert: true,",
+				"     mapColumn(",
+				"          RESTAURANT_SK = ROWNUM,",
+				"          RESTAURANT_NAME = BUSINESS_NAME,",
+				"          STREET_ADDRESS = ADDRESS,",
+				"          ZIPCODE = ZIP_CODE,",
+				"          CITY,",
+				"          STATE,",
+				"          DI_JOB_ID,",
+				"          DI_LOAD_DATE = DI_LOAD_DT",
+				"     )) ~> sinkChicago"
+			]
+		}
+	}
+}

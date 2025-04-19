@@ -3,11 +3,11 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Data flow1",
+				"name": "DIM_RESTAURANT",
 				"type": "ExecuteDataFlow",
 				"dependsOn": [],
 				"policy": {
-					"timeout": "0.12:00:00",
+					"timeout": "0.00:30:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
 					"secureOutput": false,
@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "Dim_Inspection_Type",
+						"referenceName": "dataflowDIMRESTAURANT",
 						"type": "DataFlowReference"
 					},
 					"compute": {
