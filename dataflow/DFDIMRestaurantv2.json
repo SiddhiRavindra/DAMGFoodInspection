@@ -24,6 +24,13 @@
 						"type": "DatasetReference"
 					},
 					"name": "sourceMaxId"
+				},
+				{
+					"dataset": {
+						"referenceName": "SF_Restaurant_v2",
+						"type": "DatasetReference"
+					},
+					"name": "sourcedimrestaurant"
 				}
 			],
 			"sinks": [
@@ -121,10 +128,23 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'table') ~> sourceDIMRESTAURANTCHICAGO",
-				"source(allowSchemaDrift: true,",
+				"source(output(",
+				"          MAXRESTAURANTSK as decimal(38,0)",
+				"     ),",
+				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     query: 'select  NVL(MAX())',",
+				"     query: 'select NVL(MAX(RESTAURANT_SK),0) as MaxRestaurantSK FROM FOOD_SCHEMA.DIM_RESTAURANT_TEST',",
 				"     format: 'query') ~> sourceMaxId",
+				"source(output(",
+				"          RESTAURANT_SK as decimal(38,0),",
+				"          RESTAURANT_NAME as string,",
+				"          STREET_ADDRESS as string,",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> sourcedimrestaurant",
 				"join1 derive(DI_LOAD_DT = currentTimestamp()) ~> derivedColumn1",
 				"sourceDIMRESTAURANTDALLAS derive(DI_JOD_ID = \"DallasJob\") ~> derivedColumn2",
 				"sourceDIMRESTAURANTCHICAGO derive(DI_JOD_ID = \"ChicagoJob\") ~> derivedColumn3",
