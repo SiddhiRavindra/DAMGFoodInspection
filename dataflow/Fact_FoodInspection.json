@@ -186,7 +186,7 @@
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinLocation",
-				"joinLocation, sourceDimInspectionType join(sourceStageChicago@INSPECTION_TYPE == sourceDimInspectionType@INSPECTION_TYPE,",
+				"joinLocation, sourceDimInspectionType join(ALSO_KNOWN_AS == sourceDimInspectionType@INSPECTION_TYPE,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
