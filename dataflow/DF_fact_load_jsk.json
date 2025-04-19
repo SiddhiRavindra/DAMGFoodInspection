@@ -86,6 +86,9 @@
 				},
 				{
 					"name": "joinviolation"
+				},
+				{
+					"name": "joinfact"
 				}
 			],
 			"scriptLines": [
@@ -200,16 +203,17 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'table') ~> DimViolation",
-				"source(allowSchemaDrift: true,",
+				"source(output(",
+				"          MAXFACTSK as decimal(38,0)",
+				"     ),",
+				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     query: 'Select NVL(MAX(INSPECTION_SK, 0) as MaxFactSK FROM FOOD_SCHEMA.FACT_INSPECTION',",
+				"     query: 'SELECT NVL(MAX(INSPECTION_SK), 0) AS MaxFactSK\\nFROM FOOD_SCHEMA.FACT_INSPECTION',",
 				"     format: 'query') ~> Factinspection",
 				"sourcechicago derive(DI_JOB_ID = \"ChicagoJob\") ~> derivedColumn1",
 				"sourcedallas derive(DI_JOB_ID = \"DallasJob\") ~> derivedColumn2",
 				"derivedColumn1, derivedColumn2 union(byName: true)~> union1",
-				"union1, DimRestaurant join(union1@RESTAURANT_NAME == DimRestaurant@RESTAURANT_NAME",
-				"     && union1@STREET_ADDRESS == DimRestaurant@STREET_ADDRESS",
-				"     && union1@CITY == DimRestaurant@CITY,",
+				"union1, DimRestaurant join(union1@RESTAURANT_NAME == DimRestaurant@RESTAURANT_NAME,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
@@ -236,7 +240,12 @@
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> joinviolation"
+				"     broadcast: 'auto')~> joinviolation",
+				"joinviolation, Factinspection join(1==1,",
+				"     joinType:'cross',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinfact"
 			]
 		}
 	}
