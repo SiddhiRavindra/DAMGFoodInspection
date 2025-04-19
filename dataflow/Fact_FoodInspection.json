@@ -23,21 +23,28 @@
 						"referenceName": "SF_DIM_Inspection_Type",
 						"type": "DatasetReference"
 					},
-					"name": "source3"
+					"name": "sourceDimInspectionType"
 				},
 				{
 					"dataset": {
 						"referenceName": "SF_Dim_Location",
 						"type": "DatasetReference"
 					},
-					"name": "source4"
+					"name": "sourceDimLocation"
 				},
 				{
 					"dataset": {
 						"referenceName": "SF_Dim_Violation",
 						"type": "DatasetReference"
 					},
-					"name": "source5"
+					"name": "sourceDimViolation"
+				},
+				{
+					"dataset": {
+						"referenceName": "SFDIMRESTAURANT",
+						"type": "DatasetReference"
+					},
+					"name": "sourceDimRestaurant"
 				}
 			],
 			"sinks": [],
@@ -122,7 +129,7 @@
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     format: 'table') ~> source3",
+				"     format: 'table') ~> sourceDimInspectionType",
 				"source(output(",
 				"          LOCATION_SK as decimal(38,0),",
 				"          ZIPCODE as string,",
@@ -135,7 +142,7 @@
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     format: 'table') ~> source4",
+				"     format: 'table') ~> sourceDimLocation",
 				"source(output(",
 				"          VIOLATION_SK as decimal(38,0),",
 				"          VIOLATION_NUMBER as decimal(38,0),",
@@ -145,7 +152,20 @@
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     format: 'table') ~> source5",
+				"     format: 'table') ~> sourceDimViolation",
+				"source(output(",
+				"          RESTAURANT_SK as decimal(38,0),",
+				"          RESTAURANT_NAME as string,",
+				"          STREET_ADDRESS as string,",
+				"          ZIPCODE as string,",
+				"          CITY as string,",
+				"          STATE as string,",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> sourceDimRestaurant",
 				"source1 derive(DI_JOB_ID = \"ChicagoJob\") ~> DerivedChicago",
 				"source2 derive(DI_JOB_ID = \"DallasJob\") ~> DerivedDallas",
 				"DerivedChicago, DerivedDallas union(byName: true)~> union1",
