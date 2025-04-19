@@ -20,7 +20,7 @@
 				},
 				{
 					"dataset": {
-						"referenceName": "SFDIMRESTAURANT",
+						"referenceName": "SF_Restaurant_v2",
 						"type": "DatasetReference"
 					},
 					"name": "DimRestaurant"
@@ -151,9 +151,6 @@
 				"          RESTAURANT_SK as decimal(38,0),",
 				"          RESTAURANT_NAME as string,",
 				"          STREET_ADDRESS as string,",
-				"          ZIPCODE as string,",
-				"          CITY as string,",
-				"          STATE as string,",
 				"          DI_JOB_ID as string,",
 				"          DI_LOAD_DATE as date",
 				"     ),",
@@ -218,9 +215,9 @@
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinrestaurant",
-				"joinrestaurant, DimLocation join(ZIP_CODE == DimLocation@ZIPCODE",
-				"     && union1@LONGITUDE == DimLocation@LONGITUDE",
-				"     && union1@LATITUDE == DimLocation@LATITUDE,",
+				"joinrestaurant, DimLocation join(ZIP_CODE == ZIPCODE",
+				"     && union1@CITY == DimLocation@CITY",
+				"     && union1@STATE == DimLocation@STATE,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
@@ -235,8 +232,7 @@
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joindim",
-				"joindim, DimViolation join(union1@VIOLATION_NUMBER == DimViolation@VIOLATION_NUMBER",
-				"     && union1@VIOLATION_DESCRIPTION == DimViolation@VIOLATION_DESCRIPTION,",
+				"joindim, DimViolation join(union1@VIOLATION_DESCRIPTION == DimViolation@VIOLATION_DESCRIPTION,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
