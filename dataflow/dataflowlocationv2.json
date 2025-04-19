@@ -27,7 +27,7 @@
 				},
 				{
 					"dataset": {
-						"referenceName": "SF_Dim_Location",
+						"referenceName": "SF_Dimlocation_v2",
 						"type": "DatasetReference"
 					},
 					"name": "sourcedimlocation"
@@ -36,7 +36,7 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "SF_Dim_Location",
+						"referenceName": "SF_Dimlocation_v2",
 						"type": "DatasetReference"
 					},
 					"name": "sink1"
@@ -152,7 +152,7 @@
 				"     format: 'table') ~> sourcedimlocation",
 				"sourcechicago derive(DI_JOB_ID = \"ChicagoJob\") ~> derivedchicago",
 				"sourcedallas derive(DI_JOB_ID = \"DallasJob\") ~> derivedDallas",
-				"derivedchicago union(byName: true)~> union1",
+				"derivedchicago, derivedDallas union(byName: true)~> union1",
 				"union1, sourcemax join(1==1,",
 				"     joinType:'cross',",
 				"     matchType:'exact',",
