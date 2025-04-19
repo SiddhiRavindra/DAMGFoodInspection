@@ -1,0 +1,99 @@
+{
+	"name": "Dim_Inspection_Type",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DallasSFSink",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "SF_DIM_Inspection",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "surrogateKey1"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          RECORDID as decimal(38,0),",
+				"          RESTAURANT_NAME as string,",
+				"          INSPECTION_YEAR as string,",
+				"          INSPECTION_TYPE as string,",
+				"          INSPECTION_SCORE as decimal(38,0),",
+				"          INSPECTION_DATE as date,",
+				"          STREET_NUMBER as decimal(38,0),",
+				"          STREET_NAME as string,",
+				"          STREET_DIRECTION as string,",
+				"          STREET_ADDRESS as string,",
+				"          STREET_UNIT as string,",
+				"          STREET_TYPE as string,",
+				"          ZIP_CODE as decimal(38,0),",
+				"          CITY as string,",
+				"          STATE as string,",
+				"          LATITUDE as double,",
+				"          LONGITUDE as double,",
+				"          VIOLATION_COUNT as decimal(38,0),",
+				"          TOTAL_VIOLATION_POINTS as decimal(38,0),",
+				"          LOCATION_MISSING as string,",
+				"          VIOLATION_DESCRIPTION as string,",
+				"          VIOLATION_NUMBER as decimal(38,0)",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> source1",
+				"source1 keyGenerate(output(INSPECTIONTYPE_SK as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> surrogateKey1",
+				"surrogateKey1 derive(DI_JOB_ID = uuid(),",
+				"          DI_LOAD_DATE = currentTimestamp()) ~> derivedColumn1",
+				"derivedColumn1 select(mapColumn(",
+				"          INSPECTIONTYPE_SK,",
+				"          INSPECTION_TYPE,",
+				"          DI_JOB_ID,",
+				"          DI_LOAD_DATE",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          INSPECTIONTYPE_SK as decimal(38,0),",
+				"          INSPECTION_TYPE as string,",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     stageInsert: true,",
+				"     mapColumn(",
+				"          INSPECTIONTYPE_SK,",
+				"          INSPECTION_TYPE,",
+				"          DI_JOB_ID,",
+				"          DI_LOAD_DATE",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}

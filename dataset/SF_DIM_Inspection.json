@@ -1,0 +1,35 @@
+{
+	"name": "SF_DIM_Inspection",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_Food_Inspection_SF",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SnowflakeV2Table",
+		"schema": [
+			{
+				"name": "INSPECTIONTYPE_SK",
+				"type": "NUMBER",
+				"precision": 38,
+				"scale": 0
+			},
+			{
+				"name": "INSPECTION_TYPE",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "DI_JOB_ID",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "DI_LOAD_DATE",
+				"type": "DATE"
+			}
+		],
+		"typeProperties": {
+			"schema": "FOOD_SCHEMA",
+			"table": "DIM_INSPECTION_TYPE"
+		}
+	}
+}
