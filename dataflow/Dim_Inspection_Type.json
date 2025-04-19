@@ -9,7 +9,14 @@
 						"referenceName": "DallasSFSink",
 						"type": "DatasetReference"
 					},
-					"name": "source1"
+					"name": "sourceDallasStage"
+				},
+				{
+					"dataset": {
+						"referenceName": "ChicagoSFSink",
+						"type": "DatasetReference"
+					},
+					"name": "source2"
 				}
 			],
 			"sinks": [
@@ -18,7 +25,14 @@
 						"referenceName": "SF_DIM_Inspection",
 						"type": "DatasetReference"
 					},
-					"name": "sink1"
+					"name": "sinkDimInspection"
+				},
+				{
+					"dataset": {
+						"referenceName": "SF_DIM_Inspection_Type",
+						"type": "DatasetReference"
+					},
+					"name": "sinkDimInspectionChicago"
 				}
 			],
 			"transformations": [
@@ -30,9 +44,21 @@
 				},
 				{
 					"name": "select1"
+				},
+				{
+					"name": "surrogateKey2"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "select2"
 				}
 			],
 			"scriptLines": [
+				"parameters{",
+				"     JobID as string (\"10\")",
+				"}",
 				"source(output(",
 				"          RECORDID as decimal(38,0),",
 				"          RESTAURANT_NAME as string,",
@@ -59,8 +85,36 @@
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     format: 'table') ~> source1",
-				"source1 keyGenerate(output(INSPECTIONTYPE_SK as long),",
+				"     format: 'table') ~> sourceDallasStage",
+				"source(output(",
+				"          INSPECTION_ID as decimal(38,0),",
+				"          BUSINESS_NAME as string,",
+				"          ALSO_KNOWN_AS as string,",
+				"          LICENSE_NUMBER as decimal(38,0),",
+				"          FACILITY_TYPE as string,",
+				"          RISK as string,",
+				"          ADDRESS as string,",
+				"          CITY as string,",
+				"          STATE as string,",
+				"          ZIP_CODE as decimal(38,0),",
+				"          INSPECTION_DATE as date,",
+				"          INSPECTION_TYPE as string,",
+				"          INSPECTION_RESULTS as string,",
+				"          VIOLATIONS as string,",
+				"          LATITUDE as double,",
+				"          LONGITUDE as double,",
+				"          LOCATION as string,",
+				"          GEO_MISSING as string,",
+				"          VIOLATION_COUNT as decimal(38,0),",
+				"          OUTCOME_CATEGORY as string,",
+				"          SINGLE_VIOLATION_ENTRY as string,",
+				"          VIOLATION_DESCRIPTION as string,",
+				"          VIOLATION_NUMBER as decimal(38,0)",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> source2",
+				"sourceDallasStage keyGenerate(output(INSPECTIONTYPE_SK as long),",
 				"     startAt: 1L,",
 				"     stepValue: 1L) ~> surrogateKey1",
 				"surrogateKey1 derive(DI_JOB_ID = uuid(),",
@@ -73,6 +127,19 @@
 				"     ),",
 				"     skipDuplicateMapInputs: false,",
 				"     skipDuplicateMapOutputs: false) ~> select1",
+				"source2 keyGenerate(output(INSPECTIONTYPE_SK as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> surrogateKey2",
+				"surrogateKey2 derive(DI_JOB_ID = uuid(),",
+				"          DI_LOAD_DATE = currentTimestamp()) ~> derivedColumn2",
+				"derivedColumn2 select(mapColumn(",
+				"          INSPECTIONTYPE_SK,",
+				"          INSPECTION_TYPE,",
+				"          DI_JOB_ID,",
+				"          DI_LOAD_DATE",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> select2",
 				"select1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
@@ -92,7 +159,27 @@
 				"          INSPECTION_TYPE,",
 				"          DI_JOB_ID,",
 				"          DI_LOAD_DATE",
-				"     )) ~> sink1"
+				"     )) ~> sinkDimInspection",
+				"select2 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          INSPECTIONTYPE_SK as decimal(38,0),",
+				"          INSPECTION_TYPE as string,",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     stageInsert: true,",
+				"     mapColumn(",
+				"          INSPECTIONTYPE_SK,",
+				"          INSPECTION_TYPE,",
+				"          DI_JOB_ID,",
+				"          DI_LOAD_DATE",
+				"     )) ~> sinkDimInspectionChicago"
 			]
 		}
 	}
