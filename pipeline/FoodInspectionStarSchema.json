@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "Dim_Inspection_Type",
+						"referenceName": "Test_Dim_Inspection_Type",
 						"type": "DataFlowReference"
 					},
 					"compute": {
