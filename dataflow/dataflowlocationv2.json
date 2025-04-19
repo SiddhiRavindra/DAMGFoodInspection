@@ -1,0 +1,51 @@
+{
+	"name": "dataflowlocationv2",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"name": "sourcechicago"
+				},
+				{
+					"name": "sourcedallas"
+				},
+				{
+					"dataset": {
+						"referenceName": "SF_Dim_Location",
+						"type": "DatasetReference"
+					},
+					"name": "sourcemax"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "derivedchicago"
+				},
+				{
+					"name": "derivedDallas"
+				},
+				{
+					"name": "union1"
+				}
+			],
+			"scriptLines": [
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false) ~> sourcechicago",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false) ~> sourcedallas",
+				"source(output(",
+				"          MAXVIOLATIONSK as decimal(38,0)",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     query: 'select NVL(MAX(LOCATION_SK),0) as MaxViolationSK FROM FOOD_SCHEMA.DIM_LOCATION_TEST',",
+				"     format: 'query') ~> sourcemax",
+				"sourcechicago derive(DI_JOB_ID = \"ChicagoJob\") ~> derivedchicago",
+				"sourcedallas derive(DI_JOB_ID = \"DallasJob\") ~> derivedDallas",
+				"derivedchicago union(byName: true)~> union1"
+			]
+		}
+	}
+}
