@@ -181,7 +181,7 @@
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> joinDate",
-				"joinDate, sourceDimLocation join(sourceDimRestaurant@CITY == sourceDimLocation@CITY,",
+				"joinDate, sourceDimLocation join(sourceStageChicago@CITY == sourceDimLocation@CITY,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
@@ -246,16 +246,15 @@
 				"     format: 'table',",
 				"     stageInsert: true,",
 				"     mapColumn(",
-				"          INSPECTION_SK = inspection_SK,",
 				"          RESTAURANT_SK,",
 				"          DATE_SK,",
 				"          LOCATION_SK,",
+				"          INSPECTIONTYPE_SK,",
 				"          VIOLATION_SK,",
 				"          VIOLATION_COUNT,",
 				"          CITY,",
 				"          STATE,",
-				"          DI_JOB_ID,",
-				"          DI_LOAD_DATE = DI_LOAD_DT",
+				"          DI_LOAD_DATE",
 				"     )) ~> sink1"
 			]
 		}
