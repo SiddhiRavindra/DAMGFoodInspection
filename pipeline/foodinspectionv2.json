@@ -97,7 +97,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "DataflowInspectiontype",
+						"referenceName": "dataflow2",
 						"type": "DataFlowReference"
 					},
 					"compute": {
