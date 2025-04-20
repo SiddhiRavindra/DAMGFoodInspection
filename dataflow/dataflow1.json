@@ -282,7 +282,6 @@
 				"          LOCATION_SK as decimal(38,0),",
 				"          INSPECTIONTYPE_SK as decimal(38,0),",
 				"          VIOLATION_SK as decimal(38,0),",
-				"          INSPECTION_TYPE as string,",
 				"          VIOLATION_COUNT as decimal(38,0),",
 				"          CITY as string,",
 				"          STATE as string,",

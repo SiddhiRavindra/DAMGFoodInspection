@@ -45,10 +45,6 @@
 				"scale": 0
 			},
 			{
-				"name": "INSPECTION_TYPE",
-				"type": "VARCHAR"
-			},
-			{
 				"name": "VIOLATION_COUNT",
 				"type": "NUMBER",
 				"precision": 38,
