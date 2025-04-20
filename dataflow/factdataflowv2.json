@@ -235,7 +235,7 @@
 				"     format: 'query') ~> sourcefactmax",
 				"sourcechicago derive(DI_JOB_ID = \"ChicagoJob\") ~> derivedChicago",
 				"sourcedallas derive(DI_JOB_ID = \"DallasJob\") ~> derivedDallas",
-				"derivedChicago, derivedDallas union(byName: false)~> union1",
+				"derivedChicago, derivedDallas union(byName: true)~> union1",
 				"aggregate2, sourcedimrestaurant join(aggregate2@RESTAURANT_NAME == sourcedimrestaurant@RESTAURANT_NAME",
 				"     && aggregate2@STREET_ADDRESS == sourcedimrestaurant@STREET_ADDRESS,",
 				"     joinType:'inner',",
