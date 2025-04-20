@@ -19,15 +19,11 @@
 					"name": "sourcedallas"
 				},
 				{
-					"dataset": {
-						"referenceName": "SF_Inspection_v2",
-						"type": "DatasetReference"
-					},
 					"name": "sourcemax"
 				},
 				{
 					"dataset": {
-						"referenceName": "SF_Inspection_v2",
+						"referenceName": "SF_Inspection_v2_new",
 						"type": "DatasetReference"
 					},
 					"name": "sourcediminspection"
@@ -43,18 +39,6 @@
 				},
 				{
 					"name": "union1"
-				},
-				{
-					"name": "join1"
-				},
-				{
-					"name": "aggregate1"
-				},
-				{
-					"name": "join2"
-				},
-				{
-					"name": "select1"
 				}
 			],
 			"scriptLines": [
@@ -114,42 +98,14 @@
 				"     validateSchema: false,",
 				"     format: 'table') ~> sourcedallas",
 				"source(allowSchemaDrift: true,",
+				"     validateSchema: false) ~> ",
+				"source(allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     query: (select NVL(MAX(INSPECTIONTYPE_SK), 0) as MaxViolationsk FROM FOOD_SCHEMA.DIM_INSPECTION_TYPE_TEST\\n),",
-				"     format: 'query') ~> sourcemax",
-				"source(output(",
-				"          INSPECTIONTYPE_SK as decimal(38,0),",
-				"          INSPECTION_TYPE as string,",
-				"          DI_JOB_ID as string,",
-				"          DI_LOAD_DATE as date",
-				"     ),",
-				"     allowSchemaDrift: true,",
-				"     validateSchema: false,",
-				"     format: 'table') ~> sourcediminspection",
-				"sourcechicago derive() ~> derivedChicago",
-				"sourcedallas derive() ~> derivedDallas",
-				"derivedChicago, derivedDallas union(byName: true)~> union1",
-				"union1, sourcemax join(1==1,",
-				"     joinType:'cross',",
-				"     matchType:'exact',",
-				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> join1",
-				"join1 aggregate(groupBy(INSPECTION_TYPE = union1@INSPECTION_TYPE),",
-				"     CountRow = count(INSPECTION_ID)) ~> aggregate1",
-				"aggregate1, sourcediminspection join(aggregate1@INSPECTION_TYPE == sourcediminspection@INSPECTION_TYPE,",
-				"     joinType:'left',",
-				"     matchType:'exact',",
-				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> join2",
-				"join2 select(mapColumn(",
-				"          INSPECTION_TYPE = aggregate1@INSPECTION_TYPE,",
-				"          CountRow,",
-				"          INSPECTIONTYPE_SK,",
-				"          DI_JOB_ID,",
-				"          DI_LOAD_DATE",
-				"     ),",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select1"
+				"     query: 'SELECT NVL(MAX(INSPECTIONTYPE_SK), 0) AS MaxInspectionTypeSK FROM FOOD_SCHEMA.DIM_INSPECTION_TYPE_TEST',",
+				"     format: 'query') ~> ",
+				"sourcechicago derive(DI_JOB_ID = \"ChicagoJob\") ~> derivedChicago",
+				"sourcedallas derive(DI_JOB_ID = \"DallasJob\") ~> derivedDallas",
+				"derivedChicago, derivedDallas union(byName: true)~> union1"
 			]
 		}
 	}
