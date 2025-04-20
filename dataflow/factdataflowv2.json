@@ -52,9 +52,24 @@
 						"type": "DatasetReference"
 					},
 					"name": "sourcediminspection"
+				},
+				{
+					"dataset": {
+						"referenceName": "SF_Fact_v2",
+						"type": "DatasetReference"
+					},
+					"name": "sourcefactmax"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "SF_Fact_v2",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
 			"transformations": [
 				{
 					"name": "derivedChicago"
@@ -88,6 +103,12 @@
 				},
 				{
 					"name": "surrogateKey1"
+				},
+				{
+					"name": "join6"
+				},
+				{
+					"name": "select2"
 				}
 			],
 			"scriptLines": [
@@ -199,6 +220,13 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'table') ~> sourcediminspection",
+				"source(output(",
+				"          MAXVIOLATIONSK as decimal(38,0)",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     query: 'select NVL(MAX(INSPECTION_SK),0) as MaxViolationSK FROM FOOD_SCHEMA. FACT_INSPECTION_V2',",
+				"     format: 'query') ~> sourcefactmax",
 				"sourcechicago derive(DI_JOB_ID = \"ChicagoJob\") ~> derivedChicago",
 				"sourcedallas derive(DI_JOB_ID = \"DallasJob\") ~> derivedDallas",
 				"derivedChicago, derivedDallas union(byName: true)~> union1",
@@ -208,8 +236,7 @@
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> join1",
-				"join1, sourcedimlocation join(ZIP_CODE == ZIPCODE",
-				"     && union1@CITY == sourcedimlocation@CITY",
+				"join1, sourcedimlocation join(union1@CITY == sourcedimlocation@CITY",
 				"     && union1@STATE == sourcedimlocation@STATE,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
@@ -231,8 +258,9 @@
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> join5",
-				"join5 derive(DI_LOAD_DATE = currentDate()) ~> derivedColumn1",
-				"surrogateKey1 select(mapColumn(",
+				"surrogateKey1 derive(DI_LOAD_DATE = currentDate(),",
+				"          rownum = MAXVIOLATIONSK+rownum) ~> derivedColumn1",
+				"derivedColumn1 select(mapColumn(",
 				"          CITY = union1@CITY,",
 				"          STATE = union1@STATE,",
 				"          VIOLATION_COUNT,",
@@ -247,9 +275,52 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select1",
-				"derivedColumn1 keyGenerate(output(rownum as long),",
+				"select2 keyGenerate(output(rownum as long),",
 				"     startAt: 1L,",
-				"     stepValue: 1L) ~> surrogateKey1"
+				"     stepValue: 1L) ~> surrogateKey1",
+				"join5, sourcefactmax join(1==1,",
+				"     joinType:'cross',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join6",
+				"join6 select(mapColumn(",
+				"          CITY = union1@CITY,",
+				"          STATE = union1@STATE,",
+				"          VIOLATION_COUNT,",
+				"          DI_JOB_ID = union1@DI_JOB_ID,",
+				"          RESTAURANT_SK,",
+				"          LOCATION_SK,",
+				"          DATE_SK,",
+				"          VIOLATION_SK,",
+				"          INSPECTIONTYPE_SK,",
+				"          MAXVIOLATIONSK",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          INSPECTION_SK as decimal(38,0),",
+				"          RESTAURANT_SK as decimal(38,0),",
+				"          DATE_SK as decimal(38,0),",
+				"          LOCATION_SK as decimal(38,0),",
+				"          INSPECTIONTYPE_SK as decimal(38,0),",
+				"          VIOLATION_SK as decimal(38,0),",
+				"          INSPECTION_TYPE as string,",
+				"          VIOLATION_COUNT as decimal(38,0),",
+				"          CITY as string,",
+				"          STATE as string,",
+				"          DI_JOB_ID as string,",
+				"          DI_LOAD_DATE as date",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     stageInsert: true) ~> sink1"
 			]
 		}
 	}
