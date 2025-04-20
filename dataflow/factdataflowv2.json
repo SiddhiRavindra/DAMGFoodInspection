@@ -235,7 +235,7 @@
 				"derivedChicago, derivedDallas union(byName: true)~> union1",
 				"union1, sourcedimrestaurant join(union1@RESTAURANT_NAME == sourcedimrestaurant@RESTAURANT_NAME",
 				"     && union1@STREET_ADDRESS == sourcedimrestaurant@STREET_ADDRESS,",
-				"     joinType:'right',",
+				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> join1",
